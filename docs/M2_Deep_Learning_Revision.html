@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M2 Deep Learning - Complete Exam Revision</title>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+/* ReadTheDocs-inspired theme */
+:root {
+  --sidebar-bg: #343131;
+  --sidebar-text: #d9d9d9;
+  --sidebar-link: #d9d9d9;
+  --sidebar-active: #404040;
+  --sidebar-highlight: #2980b9;
+  --main-bg: #fcfcfc;
+  --text-color: #404040;
+  --heading-color: #2980b9;
+  --code-bg: #f8f8f8;
+  --border-color: #e1e4e5;
+  --admonition-note: #6ab0de;
+  --admonition-warning: #f0b37e;
+  --admonition-tip: #1abc9c;
+  --admonition-important: #e74c3c;
+  --formula-bg: #f0f6ff;
+  --sidebar-width: 300px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Lato', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-color);
+  background: var(--main-bg);
+  line-height: 1.65;
+  font-size: 16px;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+  position: fixed;
+  top: 0; left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  overflow-y: auto;
+  z-index: 100;
+  padding-bottom: 40px;
+}
+
+.sidebar-header {
+  padding: 20px;
+  background: #2980b9;
+  text-align: center;
+}
+
+.sidebar-header h1 {
+  color: #fff;
+  font-size: 1.3em;
+  margin: 0;
+}
+
+.sidebar-header p {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.85em;
+  margin-top: 4px;
+}
+
+.sidebar-search {
+  padding: 10px 15px;
+  border-bottom: 1px solid #4e4a4a;
+}
+
+.sidebar-search input {
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 3px;
+  font-size: 0.9em;
+  background: #4e4a4a;
+  color: #fff;
+}
+
+.sidebar-search input::placeholder { color: #999; }
+
+.sidebar nav { padding: 10px 0; }
+
+.sidebar nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar nav > ul > li > a {
+  display: block;
+  padding: 8px 20px;
+  color: var(--sidebar-link);
+  text-decoration: none;
+  font-size: 0.95em;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+
+.sidebar nav > ul > li > a:hover,
+.sidebar nav > ul > li > a.active {
+  background: var(--sidebar-active);
+  border-left-color: var(--sidebar-highlight);
+  color: #fff;
+}
+
+.sidebar nav > ul > li > ul {
+  display: none;
+  padding: 0;
+}
+
+.sidebar nav > ul > li.expanded > ul { display: block; }
+
+.sidebar nav > ul > li > ul > li > a {
+  display: block;
+  padding: 5px 20px 5px 35px;
+  color: #bbb;
+  text-decoration: none;
+  font-size: 0.88em;
+  transition: color 0.15s;
+}
+
+.sidebar nav > ul > li > ul > li > a:hover { color: #fff; }
+
+/* Main Content */
+.main-content {
+  margin-left: var(--sidebar-width);
+  padding: 30px 50px 60px;
+  max-width: 900px;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  font-size: 0.85em;
+  color: #999;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.breadcrumb a { color: var(--heading-color); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+
+/* Typography */
+h1, h2, h3, h4 { color: var(--heading-color); font-weight: 700; }
+h1 { font-size: 2em; margin: 0 0 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border-color); }
+h2 { font-size: 1.55em; margin: 35px 0 15px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
+h3 { font-size: 1.25em; margin: 25px 0 10px; }
+h4 { font-size: 1.05em; margin: 20px 0 8px; }
+
+p { margin: 0 0 14px; }
+
+a { color: var(--heading-color); }
+
+/* Lists */
+ul, ol { margin: 0 0 14px 25px; }
+li { margin-bottom: 5px; }
+
+/* Code */
+code {
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.9em;
+  border: 1px solid #e1e4e5;
+}
+
+pre {
+  background: var(--code-bg);
+  padding: 16px 20px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  overflow-x: auto;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+pre code { background: none; border: none; padding: 0; }
+
+/* Formula / Math blocks */
+.formula {
+  background: var(--formula-bg);
+  border: 1px solid #c5d9ed;
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin: 12px 0 16px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-size: 1.05em;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.formula-inline {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-style: italic;
+}
+
+/* Admonitions */
+.admonition {
+  padding: 14px 18px;
+  margin: 16px 0;
+  border-radius: 4px;
+  border-left: 4px solid;
+}
+
+.admonition-title {
+  font-weight: 700;
+  margin-bottom: 6px;
+  font-size: 0.95em;
+}
+
+.admonition.note { background: #e7f2fa; border-color: var(--admonition-note); }
+.admonition.note .admonition-title { color: #2980b9; }
+
+.admonition.warning { background: #fdf3e7; border-color: var(--admonition-warning); }
+.admonition.warning .admonition-title { color: #e67e22; }
+
+.admonition.tip { background: #dbfaf4; border-color: var(--admonition-tip); }
+.admonition.tip .admonition-title { color: #1abc9c; }
+
+.admonition.important { background: #fdf0ed; border-color: var(--admonition-important); }
+.admonition.important .admonition-title { color: #e74c3c; }
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0 20px;
+  font-size: 0.95em;
+}
+
+th, td {
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  text-align: left;
+}
+
+th { background: #f3f6f6; font-weight: 700; color: var(--heading-color); }
+tr:nth-child(even) { background: #f9f9f9; }
+
+/* Navigation footer */
+.nav-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
+}
+
+.nav-footer a {
+  display: inline-block;
+  padding: 10px 20px;
+  background: var(--heading-color);
+  color: #fff;
+  text-decoration: none;
+  border-radius: 3px;
+  font-size: 0.9em;
+  transition: background 0.2s;
+}
+
+.nav-footer a:hover { background: #1a6da3; }
+
+/* Topic cards on index */
+.topic-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 20px 0;
+}
+
+.topic-card {
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 18px;
+  transition: box-shadow 0.2s, transform 0.1s;
+}
+
+.topic-card:hover {
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+  transform: translateY(-1px);
+}
+
+.topic-card h3 { margin: 0 0 8px; font-size: 1.1em; }
+.topic-card h3 a { text-decoration: none; }
+.topic-card p { font-size: 0.9em; color: #666; margin: 0; }
+.topic-card .badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.75em;
+  font-weight: 700;
+  margin-top: 8px;
+}
+.badge-core { background: #d4efdf; color: #27ae60; }
+.badge-generative { background: #fadbd8; color: #c0392b; }
+.badge-rl { background: #fdebd0; color: #e67e22; }
+.badge-practical { background: #d6eaf8; color: #2980b9; }
+
+/* Comparison tables */
+.comparison { border: 2px solid var(--heading-color); border-radius: 6px; overflow: hidden; }
+.comparison th { background: var(--heading-color); color: #fff; }
+
+/* Key concept highlight */
+.key-concept {
+  background: #fef9e7;
+  border: 1px solid #f9e79f;
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin: 14px 0;
+}
+
+.key-concept strong { color: #b7950b; }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .sidebar { width: 100%; height: auto; position: relative; }
+  .main-content { margin-left: 0; padding: 20px; }
+  .topic-grid { grid-template-columns: 1fr; }
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+
+/* Print */
+@media print {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; }
+}
+
+
+/* Override for bundled file: page sections should not have margin-left */
+.page-section {
+  margin-left: 0;
+}
+
+/* Active sub-link styling */
+.sidebar nav > ul > li > ul > li > a.active {
+  color: #fff;
+  font-weight: 700;
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>M2 Deep Learning</h1>
+    <p>MPhil DIS &mdash; Exam Revision</p>
+  </div>
+  <div class="sidebar-search">
+    <input type="text" id="sidebar-search" placeholder="Search topics...">
+  </div>
+  <nav>
+    <ul>
+      <li><a href="#" data-page="index" class="active">Home</a></li>
+      <li>
+        <a href="#" class="category-toggle">Neural Networks Foundations</a>
+        <ul>
+          <li><a href="#" data-page="nn-review">NN Review (L01&ndash;L03)</a></li>
+          <li><a href="#" data-page="loss-functions">Loss Functions &amp; Training</a></li>
+          <li><a href="#" data-page="regularization">Regularization &amp; Generalization</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#" class="category-toggle">Convolutional Networks</a>
+        <ul>
+          <li><a href="#" data-page="cnns">CNNs (L04&ndash;L05)</a></li>
+          <li><a href="#" data-page="residual-nets">Residual Networks</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#" class="category-toggle">Practical Deep Learning</a>
+        <ul>
+          <li><a href="#" data-page="pytorch">PyTorch Core (L06)</a></li>
+          <li><a href="#" data-page="best-practices">Best Practices (L07&ndash;L08)</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#" class="category-toggle">Transformers &amp; LLMs</a>
+        <ul>
+          <li><a href="#" data-page="transformers">Transformers (L08&ndash;L10)</a></li>
+          <li><a href="#" data-page="llms">LLMs &amp; Decoding (L11)</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#" class="category-toggle">Reinforcement Learning</a>
+        <ul>
+          <li><a href="#" data-page="rl-foundations">RL Foundations (L12&ndash;L13)</a></li>
+          <li><a href="#" data-page="rl-algorithms">RL Algorithms (L14&ndash;L15)</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#" class="category-toggle">Generative Models</a>
+        <ul>
+          <li><a href="#" data-page="pgm">Probabilistic Graphical Models (L16)</a></li>
+          <li><a href="#" data-page="vae">Variational Autoencoders (L17)</a></li>
+          <li><a href="#" data-page="flows">Normalizing Flows (L18)</a></li>
+          <li><a href="#" data-page="diffusion">Diffusion Models (L19&ndash;L21)</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<div class="main-content">
+
+<section id="page-index" class="page-section" style="display:block">
+<h1>M2: Deep Learning &mdash; Exam Revision Guide</h1>
+  <p><strong>Course:</strong> MPhil in Data Intensive Science, Cambridge &mdash; Lent Term</p>
+  <p><strong>Lecturer:</strong> Miles Cranmer &bull; <strong>Textbook:</strong> <em>Understanding Deep Learning</em> by Simon J.D. Prince</p>
+  <p><strong>Assessment:</strong> 50% final coursework, 50% exam. Exam questions are similar to those in the textbook.</p>
+
+  <div class="admonition important">
+    <div class="admonition-title">Exam Scope</div>
+    <p>Lectures 1&ndash;21 are examinable. Lecture 22 (Research Methods) is <strong>not examinable</strong>. PGMs (L16) and some RL material are <em>not</em> covered in Prince; use the uploaded lecture notes for those.</p>
+  </div>
+
+  <h2>Topics Overview</h2>
+
+  <div class="topic-grid">
+    <div class="topic-card">
+      <h3><a href="nn-review.html">Neural Networks Review</a></h3>
+      <p>MLPs, activation functions, universal approximation, deep networks, composing piecewise-linear functions.</p>
+      <span class="badge badge-core">L01&ndash;L03 &bull; Prince Ch 3&ndash;5</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="loss-functions.html">Loss Functions &amp; Training</a></h3>
+      <p>Maximum likelihood, cross-entropy, backpropagation, SGD, Adam, momentum, learning rate schedules.</p>
+      <span class="badge badge-core">L02&ndash;L03 &bull; Prince Ch 5&ndash;7</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="regularization.html">Regularization &amp; Generalization</a></h3>
+      <p>Bias-variance tradeoff, double descent, L2/L1 regularization, dropout, early stopping, data augmentation.</p>
+      <span class="badge badge-core">L03 &bull; Prince Ch 8&ndash;9</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="cnns.html">Convolutional Neural Networks</a></h3>
+      <p>Convolution, padding, stride, channels, pooling, equivariance, AlexNet, VGG, YOLO, U-Net.</p>
+      <span class="badge badge-core">L04&ndash;L05 &bull; Prince Ch 10&ndash;11</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="pytorch.html">PyTorch Core</a></h3>
+      <p>Tensors, autograd, nn.Module, training loops, DataLoader, MLP vs CNN comparison.</p>
+      <span class="badge badge-practical">L06</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="best-practices.html">Best Practices</a></h3>
+      <p>Karpathy's recipe, debugging, loss curve diagnostics, hyperparameter tuning strategies.</p>
+      <span class="badge badge-practical">L07&ndash;L08</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="transformers.html">Transformers</a></h3>
+      <p>Self-attention, Q/K/V, multi-head attention, positional encoding, encoder/decoder, BERT, GPT, ViT.</p>
+      <span class="badge badge-core">L08&ndash;L10 &bull; Prince Ch 12</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="llms.html">LLMs &amp; Decoding</a></h3>
+      <p>Decoding strategies, temperature, top-k, beam search, RAG, multimodal LLMs, CLIP, speculative decoding.</p>
+      <span class="badge badge-core">L11</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="rl-foundations.html">RL Foundations</a></h3>
+      <p>MDPs, policies, value functions, Bellman equations, exploration vs exploitation.</p>
+      <span class="badge badge-rl">L12&ndash;L13 &bull; Prince Ch 19</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="rl-algorithms.html">RL Algorithms</a></h3>
+      <p>Dynamic programming, Monte Carlo, TD learning, Q-learning, SARSA, DQN, policy gradients, REINFORCE.</p>
+      <span class="badge badge-rl">L14&ndash;L15 &bull; Prince Ch 19</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="pgm.html">Probabilistic Graphical Models</a></h3>
+      <p>Directed PGMs, factorised joints, plates, Bayes rule, MLE vs MAP, generative stories.</p>
+      <span class="badge badge-generative">L16 &bull; Lecture notes</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="vae.html">Variational Autoencoders</a></h3>
+      <p>Latent variable models, ELBO, KL divergence, reparameterization trick, encoder-decoder.</p>
+      <span class="badge badge-generative">L17 &bull; Prince Ch 17</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="flows.html">Normalizing Flows</a></h3>
+      <p>Change of variables, Jacobian determinants, coupling layers, autoregressive flows, exact likelihoods.</p>
+      <span class="badge badge-generative">L18 &bull; Prince Ch 16</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="diffusion.html">Diffusion Models</a></h3>
+      <p>DDPM, forward/reverse process, noise schedules, ELBO, denoising score matching, classifier-free guidance.</p>
+      <span class="badge badge-generative">L19&ndash;L21 &bull; Prince Ch 18</span>
+    </div>
+  </div>
+
+  <h2>Quick Reference: Lecture-to-Chapter Mapping</h2>
+  <table>
+    <tr><th>Lectures</th><th>Topic</th><th>Prince Chapters</th></tr>
+    <tr><td>L01&ndash;L03</td><td>Neural Networks Review</td><td>Ch 3&ndash;7 (Shallow/Deep NNs, Loss, Training)</td></tr>
+    <tr><td>L03</td><td>Regularization &amp; Generalization</td><td>Ch 8&ndash;9</td></tr>
+    <tr><td>L04&ndash;L05</td><td>Convolutional Networks</td><td>Ch 10&ndash;11</td></tr>
+    <tr><td>L06</td><td>PyTorch Core</td><td>&mdash;</td></tr>
+    <tr><td>L07&ndash;L08</td><td>Best Practices</td><td>&mdash;</td></tr>
+    <tr><td>L08&ndash;L10</td><td>Transformers</td><td>Ch 12</td></tr>
+    <tr><td>L11</td><td>LLMs &amp; Decoding</td><td>Ch 12 (partial)</td></tr>
+    <tr><td>L12&ndash;L15</td><td>Reinforcement Learning</td><td>Ch 19</td></tr>
+    <tr><td>L16</td><td>Probabilistic Graphical Models</td><td>Lecture notes only</td></tr>
+    <tr><td>L17</td><td>Variational Autoencoders</td><td>Ch 17</td></tr>
+    <tr><td>L18</td><td>Normalizing Flows</td><td>Ch 16</td></tr>
+    <tr><td>L19&ndash;L21</td><td>Diffusion Models</td><td>Ch 18</td></tr>
+    <tr><td>L22</td><td>Research Methods</td><td><em>Not examinable</em></td></tr>
+  </table>
+
+  <div class="admonition tip">
+    <div class="admonition-title">Study Strategy</div>
+    <p>The prof says exam questions are similar to textbook problems. Work through the exercises at the end of each Prince chapter for the best preparation. Focus on being able to <strong>derive</strong> key results (ELBO, Bellman equations, backprop, change-of-variables) and <strong>explain</strong> architectural choices (why residual connections, why multi-head attention, why reparameterization trick).</p>
+  </div>
+</section>
+
+<section id="page-nn-review" class="page-section" style="display:none">
+<h1>Neural Networks Review</h1>
+<p><strong>Lectures:</strong> L01&ndash;L03 &bull; <strong>Prince:</strong> Chapters 3&ndash;5</p>
+
+<h2 id="notation">Notation (Prince Convention)</h2>
+<ul>
+  <li>Input: $\mathbf{x} \in \mathbb{R}^{D_i}$, Output: $\mathbf{y} \in \mathbb{R}^{D_o}$</li>
+  <li>Parameters (weights + biases): $\boldsymbol{\phi}$</li>
+  <li>Model: $\mathbf{y} = f[\mathbf{x}, \boldsymbol{\phi}]$</li>
+  <li>Hidden units / pre-activations: values before the activation function</li>
+  <li>Activations: values after the activation function</li>
+</ul>
+
+<h2 id="shallow-nn">Shallow Neural Networks (Ch 3)</h2>
+
+<p>A shallow network has <strong>one hidden layer</strong>:</p>
+
+<div class="formula">
+$$f[\mathbf{x}, \boldsymbol{\phi}] = \boldsymbol{\beta}_0 + \boldsymbol{\Omega}_1 \cdot a\!\left(\boldsymbol{\theta}_0 + \boldsymbol{\Omega}_0 \mathbf{x}\right)$$
+</div>
+
+<p>where $a(\cdot)$ is the activation function applied element-wise.</p>
+
+<h3>ReLU Activation</h3>
+<div class="formula">
+$$\text{ReLU}(z) = \max(0, z)$$
+</div>
+
+<p>With ReLU, a shallow network computes a <strong>piecewise linear function</strong>. Each hidden unit contributes one "joint" (kink) to the output. With $D$ hidden units in 1D, you get at most $D$ joints.</p>
+
+<div class="key-concept">
+  <strong>Universal Approximation Theorem:</strong> A shallow network with enough hidden units can approximate any continuous function on a compact domain to arbitrary precision. However, "enough" may mean exponentially many units &mdash; depth helps.
+</div>
+
+<h3>Key Nomenclature</h3>
+<table>
+  <tr><th>Term</th><th>Meaning</th></tr>
+  <tr><td>Biases</td><td>Y-offsets (additive constants)</td></tr>
+  <tr><td>Weights</td><td>Slopes / linear coefficients</td></tr>
+  <tr><td>Fully connected</td><td>Every unit in one layer connected to every unit in the next</td></tr>
+  <tr><td>Feedforward</td><td>No loops in the computation graph</td></tr>
+  <tr><td>Capacity</td><td>Roughly the number of hidden units</td></tr>
+</table>
+
+<h2 id="deep-nn">Deep Neural Networks (Ch 4)</h2>
+
+<p>Networks with <strong>more than one hidden layer</strong>. A deep network is a <em>composition</em> of simpler functions:</p>
+
+<div class="formula">
+$$f[\mathbf{x}, \boldsymbol{\phi}] = f_K \circ f_{K-1} \circ \cdots \circ f_1(\mathbf{x})$$
+</div>
+
+<p>where each $f_k$ is an affine transformation followed by an activation.</p>
+
+<h3>Why Depth Matters</h3>
+
+<div class="admonition note">
+  <div class="admonition-title">Exponential Expressiveness</div>
+  <p>Deep networks with ReLU can represent exponentially more linear regions than shallow networks with the same number of parameters. A network with $K$ layers of width $D$ can produce $O(D^K)$ linear regions, whereas a shallow network with $KD$ units gives only $O(KD)$ regions.</p>
+</div>
+
+<p>Composing two shallow networks:</p>
+<ul>
+  <li>Network 1 produces a piecewise linear function with $D_1$ joints</li>
+  <li>Network 2 "folds" each linear piece of Network 1, multiplying the number of regions</li>
+  <li>Result: up to $D_1 \times D_2$ linear regions from just $D_1 + D_2$ hidden units</li>
+</ul>
+
+<h3>General Matrix Form</h3>
+<p>For a $K$-layer network:</p>
+<div class="formula">
+$$\mathbf{h}_0 = \mathbf{x}$$
+$$\mathbf{h}_k = a(\boldsymbol{\beta}_k + \boldsymbol{\Omega}_k \mathbf{h}_{k-1}), \quad k = 1, \ldots, K$$
+$$\mathbf{y} = \boldsymbol{\beta}_{K+1} + \boldsymbol{\Omega}_{K+1} \mathbf{h}_K$$
+</div>
+
+<h2 id="activations">Activation Functions</h2>
+
+<table>
+  <tr><th>Function</th><th>Formula</th><th>Properties</th></tr>
+  <tr><td>ReLU</td><td>$\max(0, z)$</td><td>Default choice. Sparse activations. Can have "dead neurons."</td></tr>
+  <tr><td>Leaky ReLU</td><td>$\max(\alpha z, z)$</td><td>Avoids dead neurons ($\alpha \approx 0.01$)</td></tr>
+  <tr><td>Sigmoid</td><td>$\sigma(z) = 1/(1+e^{-z})$</td><td>Output in $(0,1)$. Used for binary classification output.</td></tr>
+  <tr><td>Tanh</td><td>$\tanh(z)$</td><td>Output in $(-1,1)$. Zero-centered.</td></tr>
+  <tr><td>Softmax</td><td>$e^{z_i} / \sum_j e^{z_j}$</td><td>Output sums to 1. Used for multiclass classification output.</td></tr>
+  <tr><td>GELU</td><td>$z \cdot \Phi(z)$</td><td>Smooth approximation of ReLU. Used in transformers.</td></tr>
+</table>
+
+<h2 id="forward-pass">Forward and Backward Pass</h2>
+
+<h3>Forward Pass</h3>
+<p>Compute activations layer by layer, from input to output. Store all intermediate values for the backward pass.</p>
+
+<h3>Backward Pass (Backpropagation)</h3>
+<p>Compute gradients of the loss $\mathcal{L}$ with respect to all parameters using the <strong>chain rule</strong> in reverse order.</p>
+
+<div class="formula">
+$$\frac{\partial \mathcal{L}}{\partial \boldsymbol{\Omega}_k} = \frac{\partial \mathcal{L}}{\partial \mathbf{h}_k} \cdot \frac{\partial \mathbf{h}_k}{\partial \boldsymbol{\Omega}_k}$$
+</div>
+
+<div class="admonition tip">
+  <div class="admonition-title">Backprop Complexity</div>
+  <p>One backward pass has roughly <strong>the same cost</strong> as one forward pass. Total gradient computation is $O(\text{number of parameters})$ per sample &mdash; this is what makes training neural networks tractable.</p>
+</div>
+
+<h3>Automatic Differentiation</h3>
+<p>Backpropagation is a special case of <strong>reverse-mode automatic differentiation</strong>. PyTorch builds a computation graph during the forward pass, then traverses it in reverse to compute gradients exactly (not numerically).</p>
+
+<h2 id="parameter-counting">Parameter Counting</h2>
+
+<p>For a fully-connected layer mapping $D_\text{in}$ inputs to $D_\text{out}$ outputs:</p>
+<div class="formula">
+$$\text{Parameters} = D_\text{in} \times D_\text{out} + D_\text{out} = D_\text{out}(D_\text{in} + 1)$$
+</div>
+<p>(weights + biases)</p>
+
+<div class="admonition warning">
+  <div class="admonition-title">Common Exam Question</div>
+  <p>Given a network architecture, count the total number of trainable parameters. Remember to include biases and consider which layers have parameters (e.g., ReLU has none, BatchNorm has $2D$ learnable parameters).</p>
+</div>
+
+<h2 id="initialization">Weight Initialization (Ch 7)</h2>
+
+<p>Proper initialization keeps activations and gradients in a well-scaled range throughout the network.</p>
+
+<h3>He (Kaiming) Initialization</h3>
+<p>For ReLU networks, initialize weights from:</p>
+<div class="formula">
+$$w_{ij} \sim \mathcal{N}\!\left(0, \frac{2}{D_\text{in}}\right)$$
+</div>
+<p>This compensates for the fact that ReLU kills half the activations (zeroes out negative values), so variance would otherwise shrink by half per layer.</p>
+
+<h3>Xavier (Glorot) Initialization</h3>
+<p>For tanh/sigmoid networks:</p>
+<div class="formula">
+$$w_{ij} \sim \mathcal{N}\!\left(0, \frac{2}{D_\text{in} + D_\text{out}}\right)$$
+</div>
+</section>
+
+<section id="page-loss-functions" class="page-section" style="display:none">
+<h1>Loss Functions &amp; Training</h1>
+<p><strong>Lectures:</strong> L02&ndash;L03 &bull; <strong>Prince:</strong> Chapters 5&ndash;7</p>
+
+<h2 id="recipe">The Recipe for Constructing Loss Functions</h2>
+
+<div class="key-concept">
+  <strong>General Recipe (from lectures):</strong>
+  <ol>
+    <li>Choose a probability distribution $\Pr(y \mid \boldsymbol{\phi})$ appropriate for your output domain</li>
+    <li>Use the network to predict the <strong>parameters</strong> of that distribution</li>
+    <li>Maximize the likelihood &rArr; minimize the <strong>negative log-likelihood</strong></li>
+  </ol>
+</div>
+
+<h2 id="mle">Maximum Likelihood Estimation</h2>
+
+<p>Given $N$ i.i.d. training examples $\{(\mathbf{x}_i, y_i)\}_{i=1}^N$, the likelihood is:</p>
+<div class="formula">
+$$\Pr(\{y_i\} \mid \boldsymbol{\phi}) = \prod_{i=1}^{N} \Pr(y_i \mid f[\mathbf{x}_i, \boldsymbol{\phi}])$$
+</div>
+
+<p>Taking the log (which is monotonic, so preserves the maximum):</p>
+<div class="formula">
+$$\log \Pr = \sum_{i=1}^{N} \log \Pr(y_i \mid f[\mathbf{x}_i, \boldsymbol{\phi}])$$
+</div>
+
+<p>We minimize the <strong>negative log-likelihood</strong> (NLL) as our loss:</p>
+<div class="formula">
+$$\mathcal{L}[\boldsymbol{\phi}] = -\sum_{i=1}^{N} \log \Pr(y_i \mid f[\mathbf{x}_i, \boldsymbol{\phi}])$$
+</div>
+
+<h2 id="regression">Example 1: Univariate Regression</h2>
+
+<p><strong>Output domain:</strong> $y \in \mathbb{R}$</p>
+<p><strong>Distribution:</strong> Normal $\Pr(y \mid \mu, \sigma^2) = \mathcal{N}(y; \mu, \sigma^2)$</p>
+<p><strong>Network predicts:</strong> $\mu = f[\mathbf{x}, \boldsymbol{\phi}]$</p>
+
+<p>The negative log-likelihood becomes:</p>
+<div class="formula">
+$$\mathcal{L} = \sum_{i=1}^N \frac{(y_i - f[\mathbf{x}_i, \boldsymbol{\phi}])^2}{2\sigma^2} + \text{const}$$
+</div>
+
+<div class="admonition note">
+  <div class="admonition-title">This is just Least Squares!</div>
+  <p>When $\sigma^2$ is constant across examples, minimizing the NLL is equivalent to minimizing the <strong>mean squared error (MSE)</strong>. The variance $\sigma^2$ disappears from the optimization.</p>
+</div>
+
+<h3>Heteroscedastic Regression</h3>
+<p>The network can also predict $\sigma^2(\mathbf{x})$ &mdash; making the noise input-dependent. The network has two outputs: $\mu$ and $\sigma^2$. The loss then retains the $\sigma^2$ terms.</p>
+
+<h2 id="binary-classification">Example 2: Binary Classification</h2>
+
+<p><strong>Output domain:</strong> $y \in \{0, 1\}$</p>
+<p><strong>Distribution:</strong> Bernoulli with parameter $\lambda \in [0,1]$</p>
+<p><strong>Problem:</strong> Network output can be anything in $\mathbb{R}$</p>
+<p><strong>Solution:</strong> Pass through the logistic sigmoid $\sigma(z) = \frac{1}{1+e^{-z}}$</p>
+
+<div class="formula">
+$$\lambda = \sigma(f[\mathbf{x}, \boldsymbol{\phi}])$$
+</div>
+
+<p>The NLL gives the <strong>binary cross-entropy loss</strong>:</p>
+<div class="formula">
+$$\mathcal{L} = -\sum_{i=1}^{N} \left[ y_i \log \lambda_i + (1-y_i) \log(1-\lambda_i) \right]$$
+</div>
+
+<p><strong>Inference:</strong> Predict $y=1$ where $\lambda > 0.5$.</p>
+
+<h2 id="multiclass">Example 3: Multiclass Classification</h2>
+
+<p><strong>Output domain:</strong> $y \in \{1, 2, \ldots, K\}$</p>
+<p><strong>Distribution:</strong> Categorical</p>
+<p><strong>Solution:</strong> Softmax maps $K$ network outputs to a probability distribution:</p>
+
+<div class="formula">
+$$\Pr(y=k) = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}$$
+</div>
+
+<p>The NLL gives the <strong>categorical cross-entropy loss</strong>:</p>
+<div class="formula">
+$$\mathcal{L} = -\sum_{i=1}^{N} \log \Pr(y_i \mid \mathbf{x}_i, \boldsymbol{\phi})$$
+</div>
+
+<h2 id="summary-losses">Summary of Loss Functions</h2>
+
+<table class="comparison">
+  <tr><th>Task</th><th>Distribution</th><th>Output Transform</th><th>Loss</th></tr>
+  <tr><td>Regression</td><td>Normal</td><td>Identity</td><td>MSE (Least Squares)</td></tr>
+  <tr><td>Binary classification</td><td>Bernoulli</td><td>Sigmoid</td><td>Binary Cross-Entropy</td></tr>
+  <tr><td>Multiclass classification</td><td>Categorical</td><td>Softmax</td><td>Categorical Cross-Entropy</td></tr>
+</table>
+
+<h2 id="optimizers">Optimization Algorithms (Ch 6)</h2>
+
+<h3>Gradient Descent</h3>
+<div class="formula">
+$$\boldsymbol{\phi} \leftarrow \boldsymbol{\phi} - \alpha \nabla_{\boldsymbol{\phi}} \mathcal{L}[\boldsymbol{\phi}]$$
+</div>
+<p>where $\alpha$ is the learning rate.</p>
+
+<h3>Stochastic Gradient Descent (SGD)</h3>
+<p>Instead of computing the gradient over all $N$ examples, use a <strong>mini-batch</strong> of size $B$:</p>
+<div class="formula">
+$$\boldsymbol{\phi} \leftarrow \boldsymbol{\phi} - \alpha \frac{1}{B}\sum_{i \in \mathcal{B}} \nabla_{\boldsymbol{\phi}} \ell_i$$
+</div>
+<ul>
+  <li>Cheaper per step: $O(B)$ instead of $O(N)$</li>
+  <li>Noise from mini-batches helps escape local minima</li>
+  <li>Acts as implicit regularization</li>
+</ul>
+
+<h3>Momentum</h3>
+<p>Exponential moving average of gradients for faster convergence:</p>
+<div class="formula">
+$$\mathbf{m}_t = \beta \mathbf{m}_{t-1} + (1-\beta) \nabla \mathcal{L}$$
+$$\boldsymbol{\phi} \leftarrow \boldsymbol{\phi} - \alpha \mathbf{m}_t$$
+</div>
+<p>Typical: $\beta = 0.9$.</p>
+
+<h3>Adam</h3>
+<p>Adaptive per-parameter learning rates with bias correction. Combines momentum with RMSProp:</p>
+<div class="formula">
+$$m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t$$
+$$v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2$$
+$$\hat{m}_t = m_t / (1 - \beta_1^t), \quad \hat{v}_t = v_t / (1 - \beta_2^t)$$
+$$\phi \leftarrow \phi - \alpha \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$$
+</div>
+<p>Default hyperparameters: $\alpha = 10^{-3}$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$.</p>
+
+<div class="admonition tip">
+  <div class="admonition-title">Practical Default</div>
+  <p>In the course, the recommended starting point is <strong>Adam with lr=3e-4 and cosine decay</strong>. This is a robust choice for most tasks before any tuning.</p>
+</div>
+
+<h2 id="learning-rate">Learning Rate Schedules</h2>
+
+<table>
+  <tr><th>Schedule</th><th>Description</th></tr>
+  <tr><td>Constant</td><td>Fixed learning rate throughout training</td></tr>
+  <tr><td>Step decay</td><td>Reduce by factor every $k$ epochs</td></tr>
+  <tr><td>Cosine decay</td><td>$\alpha_t = \alpha_0 \cdot \frac{1}{2}(1 + \cos(\pi t / T))$ &mdash; smooth annealing to zero</td></tr>
+  <tr><td>Warmup + decay</td><td>Linearly increase for first few steps, then decay</td></tr>
+</table>
+</section>
+
+<section id="page-regularization" class="page-section" style="display:none">
+<h1>Regularization &amp; Generalization</h1>
+<p><strong>Lectures:</strong> L03 &bull; <strong>Prince:</strong> Chapters 8&ndash;9</p>
+
+<h2 id="bias-variance">Bias-Variance Tradeoff (Ch 8)</h2>
+
+<p>Test error can be decomposed into three sources:</p>
+<div class="formula">
+$$\mathbb{E}[\text{test error}] = \text{noise}^2 + \text{bias}^2 + \text{variance}$$
+</div>
+
+<table>
+  <tr><th>Component</th><th>Meaning</th><th>Reduced by</th></tr>
+  <tr><td><strong>Noise</strong></td><td>Inherent randomness in the data (irreducible)</td><td>Better data collection</td></tr>
+  <tr><td><strong>Bias</strong></td><td>Systematic error from model being too simple</td><td>More capacity / flexibility</td></tr>
+  <tr><td><strong>Variance</strong></td><td>Sensitivity to choice of training set</td><td>More data / regularization</td></tr>
+</table>
+
+<h3>Double Descent</h3>
+<div class="admonition note">
+  <div class="admonition-title">Modern View: Double Descent</div>
+  <p>Classical theory predicts a U-shaped test error curve. But modern deep learning exhibits <strong>double descent</strong>: beyond the interpolation threshold (where the model can fit the training data perfectly), test error <em>decreases again</em> as model capacity increases further. This requires some form of regularization (even implicit) to work.</p>
+</div>
+
+<h3>Choosing Hyperparameters</h3>
+<p>Use three data splits:</p>
+<ul>
+  <li><strong>Training set:</strong> fit model parameters</li>
+  <li><strong>Validation set:</strong> choose hyperparameters (capacity, learning rate, regularization strength)</li>
+  <li><strong>Test set:</strong> evaluate final performance <em>once</em></li>
+</ul>
+
+<h2 id="explicit-reg">Explicit Regularization (Ch 9)</h2>
+
+<p>Add a penalty term to the loss:</p>
+<div class="formula">
+$$\tilde{\mathcal{L}}[\boldsymbol{\phi}] = \mathcal{L}[\boldsymbol{\phi}] + \lambda \cdot \Omega[\boldsymbol{\phi}]$$
+</div>
+<p>where $\lambda > 0$ controls regularization strength.</p>
+
+<h3>L2 Regularization (Weight Decay)</h3>
+<div class="formula">
+$$\Omega[\boldsymbol{\phi}] = \|\boldsymbol{\phi}\|_2^2 = \sum_j \phi_j^2$$
+</div>
+<ul>
+  <li>Encourages <strong>small</strong> weights &rArr; smoother functions</li>
+  <li>Also called Tikhonov regularization, ridge regression</li>
+  <li>In neural networks, usually applied to weights only (not biases) &rArr; "weight decay"</li>
+</ul>
+
+<h3>Probabilistic Interpretation</h3>
+<div class="key-concept">
+  <strong>L2 regularization = Gaussian prior on weights.</strong>
+  $$\Pr(\boldsymbol{\phi}) = \mathcal{N}(\mathbf{0}, \sigma_\phi^2 \mathbf{I})$$
+  MAP estimation with this prior gives the same objective as L2-regularized MLE, with $\lambda = 1/(2\sigma_\phi^2)$.
+</div>
+
+<h3>L1 Regularization</h3>
+<div class="formula">
+$$\Omega[\boldsymbol{\phi}] = \|\boldsymbol{\phi}\|_1 = \sum_j |\phi_j|$$
+</div>
+<p>Encourages <strong>sparse</strong> weights (many exactly zero). Equivalent to a Laplace prior.</p>
+
+<h2 id="implicit-reg">Implicit Regularization</h2>
+
+<h3>SGD as Regularizer</h3>
+<ul>
+  <li>Gradient descent with finite step size approximates a differential equation with an implicit regularization term</li>
+  <li>SGD noise disfavors regions where gradients are steep</li>
+  <li>SGD prefers solutions where all batches have similar gradients</li>
+  <li>Larger learning rates &rArr; stronger implicit regularization &rArr; often better generalization</li>
+</ul>
+
+<h2 id="heuristics">Regularization Heuristics</h2>
+
+<h3>Early Stopping</h3>
+<p>Stop training when validation loss starts increasing. Weights start small (near initialization) and don't have time to grow large and overfit. Reduces effective model complexity.</p>
+
+<h3>Ensembling</h3>
+<p>Train multiple models independently (different initializations or data subsets). Average their predictions. Reduces variance without increasing bias.</p>
+
+<h3>Dropout</h3>
+<p>During training, randomly zero out each hidden unit with probability $p$ (typically $p=0.5$). At test time, multiply weights by $(1-p)$.</p>
+<ul>
+  <li>Forces the network to not rely on any single hidden unit</li>
+  <li>Can be interpreted as training an implicit ensemble</li>
+  <li>Effectively reduces co-adaptation between neurons</li>
+</ul>
+
+<h3>Batch Normalization</h3>
+<p>Normalize activations within each mini-batch, then apply learnable scale and shift:</p>
+<div class="formula">
+$$\hat{h}_j = \frac{h_j - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \quad \text{then} \quad \tilde{h}_j = \gamma \hat{h}_j + \beta$$
+</div>
+<p>where $\mu_B, \sigma_B^2$ are batch statistics, and $\gamma, \beta$ are learned parameters. Typically initialized to $\gamma=1, \beta=0$.</p>
+
+<h3>Data Augmentation</h3>
+<p>Often the <strong>strongest regularizer</strong> for images. Apply label-preserving transformations:</p>
+<ul>
+  <li>Random flips, crops, rotations</li>
+  <li>Color jitter, scaling</li>
+  <li>For physics: physically-motivated transformations</li>
+</ul>
+
+<h3>Label Smoothing</h3>
+<p>Replace hard labels (0/1) with soft labels ($\epsilon / K$ for wrong classes, $1 - \epsilon + \epsilon/K$ for correct class). Prevents overconfident predictions.</p>
+
+<h3>Transfer Learning</h3>
+<p>Pre-train on a large dataset (e.g., ImageNet), then fine-tune on your smaller task-specific dataset. The pre-trained features act as a strong regularizer.</p>
+
+<h2 id="summary">Summary Table</h2>
+
+<table class="comparison">
+  <tr><th>Method</th><th>Type</th><th>Mechanism</th></tr>
+  <tr><td>L2 / Weight decay</td><td>Explicit</td><td>Penalizes large weights</td></tr>
+  <tr><td>L1</td><td>Explicit</td><td>Promotes sparsity</td></tr>
+  <tr><td>SGD noise</td><td>Implicit</td><td>Prefers flat minima</td></tr>
+  <tr><td>Early stopping</td><td>Heuristic</td><td>Limits effective capacity</td></tr>
+  <tr><td>Dropout</td><td>Heuristic</td><td>Prevents co-adaptation</td></tr>
+  <tr><td>Batch norm</td><td>Heuristic</td><td>Stabilizes + smooths loss surface</td></tr>
+  <tr><td>Data augmentation</td><td>Heuristic</td><td>Increases effective dataset size</td></tr>
+  <tr><td>Ensembling</td><td>Heuristic</td><td>Reduces variance</td></tr>
+</table>
+</section>
+
+<section id="page-cnns" class="page-section" style="display:none">
+<h1>Convolutional Neural Networks</h1>
+<p><strong>Lectures:</strong> L04&ndash;L05 &bull; <strong>Prince:</strong> Chapters 10&ndash;11</p>
+
+<h2 id="motivation">Motivation: Problems with Fully-Connected Networks for Images</h2>
+<ol>
+  <li><strong>Size:</strong> A 224&times;224 RGB image = 150,528 dimensions. One FC hidden layer &rArr; ~22 billion weights</li>
+  <li><strong>Spatial structure:</strong> Nearby pixels are statistically related; FC networks ignore this</li>
+  <li><strong>Translation:</strong> The same object at different locations should be recognized identically</li>
+</ol>
+
+<h2 id="invariance-equivariance">Invariance and Equivariance</h2>
+
+<div class="key-concept">
+  <strong>Invariance:</strong> $f[t[\mathbf{x}]] = f[\mathbf{x}]$ &mdash; output unchanged by transformation. Example: image classification should be invariant to translation.<br><br>
+  <strong>Equivariance:</strong> $f[t[\mathbf{x}]] = t[f[\mathbf{x}]]$ &mdash; output transforms the same way as input. Example: segmentation maps should shift when the image shifts.
+</div>
+
+<p>Convolution is <strong>equivariant to translation</strong> by construction.</p>
+
+<h2 id="convolution-1d">1D Convolution</h2>
+
+<p>Output is a weighted sum of neighbors using a <strong>kernel</strong> (filter):</p>
+<div class="formula">
+$$y_i = \sum_{k=0}^{K-1} w_k \cdot x_{i+k} + b$$
+</div>
+<p>where $K$ is the kernel size.</p>
+
+<h3>Key Parameters</h3>
+<table>
+  <tr><th>Parameter</th><th>Effect</th></tr>
+  <tr><td><strong>Kernel size</strong> $K$</td><td>Number of input positions combined per output. More parameters but larger receptive field.</td></tr>
+  <tr><td><strong>Stride</strong> $s$</td><td>Shift by $s$ positions per output. Stride &gt; 1 decreases output size (downsampling).</td></tr>
+  <tr><td><strong>Dilation</strong> $d$</td><td>Intersperse kernel values with zeros. Larger receptive field without more parameters.</td></tr>
+  <tr><td><strong>Padding</strong></td><td><em>Zero padding</em>: pad input with zeros to maintain size. <em>Valid</em>: no padding, output is smaller.</td></tr>
+</table>
+
+<div class="admonition warning">
+  <div class="admonition-title">Convention Warning</div>
+  <p>Always check convention! Sometimes dilation=1 means standard behavior (no dilation), sometimes dilation=0 does.</p>
+</div>
+
+<h3>Convolution as Special Case of FC</h3>
+<p>A convolutional layer is a fully-connected layer with <strong>shared weights</strong> and <strong>sparse connections</strong>. The weight matrix has a banded (Toeplitz) structure with repeated entries.</p>
+
+<h2 id="channels">Channels (Feature Maps)</h2>
+
+<p>A single convolution loses information. Solution: apply <strong>multiple convolutions</strong> and stack the results as channels.</p>
+
+<h3>Parameter Count</h3>
+<div class="formula">
+$$\text{Parameters} = C_\text{out} \times (C_\text{in} \times K + 1)$$
+</div>
+<p>For 2D convolution with kernel $K \times K$:</p>
+<div class="formula">
+$$\text{Parameters} = C_\text{out} \times (C_\text{in} \times K^2 + 1)$$
+</div>
+
+<h2 id="receptive-fields">Receptive Fields</h2>
+
+<p>The <strong>receptive field</strong> of a unit is the region of the input that influences its value. With deeper layers, the receptive field grows, allowing the network to capture larger-scale patterns while keeping kernels small.</p>
+
+<h2 id="2d-conv">2D Convolution</h2>
+
+<p>Same principles as 1D, but the kernel is $K \times K$. Weighted sum over a 2D region:</p>
+<div class="formula">
+$$y_{i,j} = \sum_{m=0}^{K-1}\sum_{n=0}^{K-1} w_{m,n} \cdot x_{i+m, j+n} + b$$
+</div>
+
+<h2 id="pooling">Downsampling and Upsampling</h2>
+
+<h3>Downsampling Methods</h3>
+<ul>
+  <li><strong>Strided convolution:</strong> stride &gt; 1 (e.g., stride 2 halves each spatial dimension)</li>
+  <li><strong>Max pooling:</strong> take maximum over a window. Provides partial translation invariance.</li>
+  <li><strong>Mean pooling:</strong> take average over a window</li>
+</ul>
+
+<h3>Upsampling Methods</h3>
+<ul>
+  <li><strong>Nearest-neighbor:</strong> duplicate pixels</li>
+  <li><strong>Bilinear interpolation:</strong> weighted average of neighbors</li>
+  <li><strong>Max-unpooling:</strong> place value at remembered max position</li>
+  <li><strong>Transposed convolution:</strong> learnable upsampling (inserts zeros, then convolves)</li>
+</ul>
+
+<h3>1&times;1 Convolution</h3>
+<p>Mixes channels without spatial interaction. Equivalent to applying a fully-connected layer independently at each spatial position. Can change the number of channels.</p>
+
+<h2 id="architectures">Key Architectures</h2>
+
+<h3>AlexNet (2012)</h3>
+<ul>
+  <li>60 million parameters (most in FC layers)</li>
+  <li>Data augmentation (2048&times;), dropout in FC layers</li>
+  <li>SGD with momentum 0.9, batch size 128, L2 weight decay</li>
+  <li>16.4% top-5 error on ImageNet</li>
+</ul>
+
+<h3>VGG (2015)</h3>
+<ul>
+  <li>19 layers, 144M parameters</li>
+  <li>Only 3&times;3 convolutions (stack to get larger receptive fields)</li>
+  <li>6.8% top-5 error</li>
+</ul>
+
+<h3>YOLO (Object Detection)</h3>
+<ul>
+  <li>Predicts bounding boxes and class probabilities on a 7&times;7 grid</li>
+  <li>Each grid cell predicts 2 boxes (x, y, h, w, confidence)</li>
+  <li>Single forward pass &rArr; real-time detection</li>
+</ul>
+
+<h3>U-Net (2016, Segmentation)</h3>
+<ul>
+  <li>Encoder-decoder architecture with skip connections</li>
+  <li>Skip connections concatenate encoder features with decoder features at the same resolution</li>
+  <li>Widely used in medical imaging and scientific applications</li>
+</ul>
+
+<h2 id="inductive-bias">Why CNNs Work Better Than FC Networks</h2>
+
+<div class="admonition tip">
+  <div class="admonition-title">Inductive Bias</div>
+  <p>CNNs have a better <strong>inductive bias</strong> (prior on the space of functions) for image-like data:
+  <ul>
+    <li>Weight sharing forces the network to process each location similarly</li>
+    <li>Local connectivity exploits spatial structure</li>
+    <li>Searches through a smaller family of functions, all of which are plausible for images</li>
+  </ul>
+  Result: far fewer parameters with better generalization. In MNIST-1D, a CNN with 2,050 parameters outperforms a FC network with 150,185 parameters.
+  </p>
+</div>
+</section>
+
+<section id="page-residual-nets" class="page-section" style="display:none">
+<h1>Residual Networks &amp; Normalization</h1>
+<p><strong>Lectures:</strong> L04&ndash;L05, L08 &bull; <strong>Prince:</strong> Chapter 11</p>
+
+<h2 id="problem">The Degradation Problem</h2>
+<p>Adding more layers to a plain (non-residual) network helps initially, but beyond a certain depth performance <strong>degrades</strong> &mdash; even on the <em>training</em> set. This is not overfitting; it's an optimization problem.</p>
+
+<div class="admonition note">
+  <div class="admonition-title">Shattered Gradients</div>
+  <p>In very deep networks, gradients at initialization change unpredictably across layers. With finite learning rates, these "shattered gradients" cause unstable training. The gradient signal becomes unreliable.</p>
+</div>
+
+<h2 id="residual-connection">Residual (Skip) Connections</h2>
+
+<p>A residual block learns a <strong>residual function</strong> $g(\mathbf{h})$ and adds it to the input:</p>
+<div class="formula">
+$$\mathbf{h}_{k+1} = \mathbf{h}_k + g[\mathbf{h}_k]$$
+</div>
+
+<p>Each block only needs to predict the <strong>change</strong> from the previous layer, rather than the entire representation.</p>
+
+<h3>Why It Helps: Gradient Flow</h3>
+<ul>
+  <li><strong>Plain network gradient:</strong> $\frac{\partial \mathbf{h}_K}{\partial \mathbf{h}_k} = \prod_{l=k}^{K-1} \frac{\partial \mathbf{h}_{l+1}}{\partial \mathbf{h}_l}$ &mdash; products can vanish or explode</li>
+  <li><strong>Residual network gradient:</strong> $\frac{\partial \mathbf{h}_K}{\partial \mathbf{h}_k} = \mathbf{I} + \ldots$ &mdash; always has an identity component, ensuring gradients can flow directly</li>
+</ul>
+
+<div class="key-concept">
+  <strong>Key insight:</strong> Residual connections roughly <em>double</em> the number of layers you can train before performance degrades. Combined with normalization, networks can go to hundreds of layers.
+</div>
+
+<h2 id="batch-norm">Batch Normalization</h2>
+
+<p>Normalizes activations within each mini-batch:</p>
+<div class="formula">
+$$\hat{h}_j = \frac{h_j - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}$$
+$$\tilde{h}_j = \gamma \hat{h}_j + \beta$$
+</div>
+
+<ul>
+  <li>$\mu_B, \sigma_B^2$: mean and variance computed over the mini-batch</li>
+  <li>$\gamma, \beta$: learnable scale and shift (initialized to 1 and 0)</li>
+  <li>In CNNs: statistics are computed over (batch) &times; (spatial dimensions) per channel</li>
+  <li>At test time: use running averages of $\mu$ and $\sigma^2$ collected during training</li>
+</ul>
+
+<p>Effects: stabilizes training, smooths the loss surface, enables larger learning rates, acts as mild regularization.</p>
+
+<h2 id="layer-norm">Layer Normalization</h2>
+
+<p>Similar to BatchNorm, but normalizes over <strong>features/channels</strong> rather than over the batch:</p>
+<ul>
+  <li>Computes statistics per sample (not per batch)</li>
+  <li>Works with any batch size (including batch size 1)</li>
+  <li>Preferred in <strong>transformers</strong> and sequence models</li>
+</ul>
+
+<h2 id="resnet-block">ResNet Block Structure</h2>
+
+<p>A typical ResNet block:</p>
+<pre><code>x &rarr; Conv &rarr; BN &rarr; ReLU &rarr; Conv &rarr; BN &rarr; (+x) &rarr; ReLU</code></pre>
+
+<p>When dimensions change (e.g., downsampling), a 1&times;1 convolution is applied to the skip connection to match dimensions.</p>
+
+<h2 id="loss-surface">Effect on Loss Surfaces</h2>
+<p>Research shows that residual connections and batch normalization make loss surfaces dramatically <strong>smoother</strong>, with fewer sharp local minima. This enables stable training and better convergence.</p>
+
+<h2 id="architectures">Notable Architectures</h2>
+
+<table>
+  <tr><th>Architecture</th><th>Key Idea</th></tr>
+  <tr><td><strong>ResNet</strong> (2016)</td><td>Residual connections. Trained up to 200+ layers.</td></tr>
+  <tr><td><strong>DenseNet</strong></td><td>Each layer receives input from <em>all</em> previous layers (concatenation)</td></tr>
+  <tr><td><strong>U-Net</strong></td><td>Encoder-decoder with skip connections at each resolution level</td></tr>
+  <tr><td><strong>Hourglass Networks</strong></td><td>Stacked encoder-decoder modules for pose estimation</td></tr>
+</table>
+</section>
+
+<section id="page-pytorch" class="page-section" style="display:none">
+<h1>PyTorch Core</h1>
+<p><strong>Lecture:</strong> L06 (Notebook)</p>
+
+<h2 id="tensors">1. Tensors</h2>
+<p>PyTorch tensors are NumPy-like arrays with GPU support and automatic differentiation.</p>
+<pre><code>import torch
+x = torch.tensor([5., 3.])           # Create a tensor
+x = torch.randn(10)                   # Random normal
+x = torch.zeros(10)                   # Zeros
+x_np = x.numpy()                      # To NumPy
+x_t = torch.tensor(np.array([1,2,3])) # From NumPy</code></pre>
+
+<h2 id="devices">2. Devices: CPU vs GPU</h2>
+<pre><code>device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+x = x.to(device)  # Move tensor to GPU</code></pre>
+
+<h2 id="autograd">3. Autograd: Automatic Differentiation</h2>
+<p>PyTorch performs tape-based reverse-mode autodiff. Set <code>requires_grad=True</code> to track gradients.</p>
+<pre><code>x = torch.tensor([np.pi/4], requires_grad=True)
+y = torch.sum(torch.cos(x) ** 2)
+grads = torch.autograd.grad(y, x)[0]  # Exact gradient</code></pre>
+<p>Each operation creates a <code>grad_fn</code> pointer that forms the computation graph for backpropagation.</p>
+
+<h2 id="optimization">4. Optimization Loop</h2>
+<pre><code>w = torch.tensor([0.0], requires_grad=True)
+opt = torch.optim.SGD([w], lr=0.1)
+
+for step in range(20):
+    opt.zero_grad()        # Clear old gradients
+    loss = (w - 3.0).pow(2).sum()
+    loss.backward()        # Compute gradients
+    opt.step()             # Update parameters</code></pre>
+
+<h2 id="nn-module">5. nn.Module: Building Models</h2>
+<p>Subclass <code>nn.Module</code> for automatic gradient tracking and parameter management.</p>
+<pre><code>class DeepNN(nn.Module):
+    def __init__(self, hidden=32):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(1, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, 1),
+        )
+
+    def forward(self, x):
+        return self.net(x)</code></pre>
+
+<div class="admonition note">
+  <div class="admonition-title">Important</div>
+  <p>All child modules must be initialized in <code>__init__</code> (not in <code>forward</code>) so that PyTorch can discover and track their parameters.</p>
+</div>
+
+<h2 id="training-loop">6. Full Training Loop</h2>
+<pre><code>net = DeepNN(hidden=32).to(device)
+opt = torch.optim.Adam(net.parameters(), lr=1e-2)
+loss_fn = nn.MSELoss()
+
+for step in range(500):
+    opt.zero_grad()
+    x = torch.randn(256, 1, device=device)
+    y = torch.sin(x)
+    pred = net(x)
+    loss = loss_fn(pred, y)
+    loss.backward()
+    opt.step()</code></pre>
+
+<h2 id="dataloader">7. DataLoader for Classification</h2>
+<pre><code>from torch.utils.data import TensorDataset, DataLoader
+
+train_ds = TensorDataset(X_train_tensor, y_train_tensor)
+train_loader = DataLoader(train_ds, batch_size=64, shuffle=True)
+
+for inputs, labels in train_loader:
+    inputs, labels = inputs.to(device), labels.to(device)
+    outputs = model(inputs)
+    loss = criterion(outputs, labels)
+    ...</code></pre>
+
+<h2 id="mlp-vs-cnn">8. MLP vs CNN Comparison</h2>
+<p>On MNIST-1D (a small 1D dataset designed to make architecture differences obvious):</p>
+<table>
+  <tr><th>Model</th><th>Parameters</th><th>Test Accuracy (20 epochs)</th></tr>
+  <tr><td>Simple MLP (1 hidden layer, 64 units)</td><td>3,274</td><td>~51%</td></tr>
+  <tr><td>Simple CNN (2 conv + 1 FC)</td><td>1,738</td><td>~67%</td></tr>
+</table>
+<p>The CNN achieves much better accuracy with <em>fewer</em> parameters, demonstrating the power of inductive bias for structured data.</p>
+
+<h2 id="key-patterns">Key Patterns to Know</h2>
+<ul>
+  <li><code>model.train()</code> / <code>model.eval()</code> &mdash; switches dropout and batch norm behavior</li>
+  <li><code>with torch.no_grad():</code> &mdash; disables gradient tracking for inference</li>
+  <li><code>loss.backward()</code> &mdash; computes gradients</li>
+  <li><code>optimizer.zero_grad()</code> &mdash; clears accumulated gradients before each step</li>
+  <li><code>optimizer.step()</code> &mdash; applies the gradient update</li>
+  <li><code>.unsqueeze(1)</code> &mdash; add channel dimension for CNN input</li>
+</ul>
+</section>
+
+<section id="page-best-practices" class="page-section" style="display:none">
+<h1>Training Best Practices</h1>
+<p><strong>Lectures:</strong> L07&ndash;L08</p>
+
+<h2 id="recipe">Karpathy's Training Recipe</h2>
+<div class="admonition important">
+  <div class="admonition-title">Neural networks fail silently</div>
+  <p>They can fit around bugs. They learn "something" even when your pipeline is broken. Be a <strong>conspiracy theorist</strong>: don't believe anything is working; verify every step.</p>
+</div>
+
+<ol>
+  <li><strong>Become one with the data.</strong> Spend hours inspecting your dataset before touching any ML. Look for duplicates, corrupted labels, class imbalances, strange min/max values.</li>
+  <li><strong>Build a simple end-to-end pipeline.</strong> Start with a linear model. Confirm the loss starts at the expected value (e.g., $-\log(1/K)$ for $K$-class classification). Beat an input-independent baseline.</li>
+  <li><strong>Overfit on a small batch (~1%).</strong> Use a slightly larger model. Drive training loss to near zero. This confirms no hidden bugs and that all "wires connect."</li>
+  <li><strong>Increase model capacity.</strong> Try to overfit the full training set. If you can't, something is wrong.</li>
+  <li><strong>Regularize.</strong> Gradually add weight decay, dropout, data augmentation, etc. Monitor validation loss.</li>
+  <li><strong>Tune hyperparameters at small scale first.</strong> Spot trends before committing to expensive large-scale runs.</li>
+</ol>
+
+<h2 id="defaults">Recommended Defaults</h2>
+<table>
+  <tr><th>Setting</th><th>Default</th></tr>
+  <tr><td>Activation</td><td>ReLU</td></tr>
+  <tr><td>Hidden layers (MLP)</td><td>2 &times; 128</td></tr>
+  <tr><td>Optimizer</td><td>Adam (default hyperparams)</td></tr>
+  <tr><td>Learning rate</td><td>3 &times; 10<sup>-4</sup> + cosine decay</td></tr>
+  <tr><td>Batch size</td><td>128</td></tr>
+  <tr><td>Weight decay</td><td>0 (increase if overfitting)</td></tr>
+  <tr><td>Initialization</td><td>He (assumes ReLU, zero-centered unit-variance inputs)</td></tr>
+</table>
+
+<h3>Model Selection by Data Type</h3>
+<table>
+  <tr><th>Data Type</th><th>Starter Model</th><th>Baseline</th></tr>
+  <tr><td>Vectors/tabular</td><td>MLP (2&times;128, ReLU)</td><td>XGBoost</td></tr>
+  <tr><td>Images</td><td>CNN (e.g., ResNet-18)</td><td>XGBoost + featurize</td></tr>
+  <tr><td>Graphs</td><td>GNN (not just GCN)</td><td>XGBoost + featurize</td></tr>
+  <tr><td>Time series</td><td>LSTM (2 layers &times; 128)</td><td>Naive last-value</td></tr>
+</table>
+
+<h2 id="diagnostics">Loss Curve Diagnostics</h2>
+<table>
+  <tr><th>Symptom</th><th>Likely Cause</th><th>Fix</th></tr>
+  <tr><td>Loss starts huge then drops to ~1 immediately</td><td>Bad init or scale mismatch, LR too high</td><td>Normalize inputs, add warmup, lower LR</td></tr>
+  <tr><td>Persistent oscillation</td><td>LR too high, momentum too high, small batch</td><td>Lower LR, tune betas, increase batch size</td></tr>
+  <tr><td>Repeating wave with fixed period</td><td>Forgot to shuffle data, sampler bug</td><td>Shuffle + stratify, check sampler seeding</td></tr>
+  <tr><td>Sudden spike then slow recovery</td><td>Outlier/corrupted batch, NaNs</td><td>Assert-finite checks, gradient clipping</td></tr>
+  <tr><td>Extremely noisy batch loss</td><td>Small batch, heavy augmentation</td><td>Track EMA, monitor val on fixed set</td></tr>
+  <tr><td>Loss jumps at specific steps</td><td>Optimizer state not restored at checkpoint</td><td>Save full checkpoint (model + optimizer + scheduler)</td></tr>
+  <tr><td>No downward trend (flat)</td><td>LR too low, frozen params, label bug</td><td>Overfit 1 batch sanity test, check requires_grad</td></tr>
+  <tr><td>Quick win then stagnation</td><td>LR too low, capacity limit</td><td>Tune LR schedule, increase capacity</td></tr>
+  <tr><td>Loss becomes NaN/Inf</td><td>Overflow, log(0), exploding gradients</td><td>Finite checks, lower LR, gradient clipping, add eps</td></tr>
+  <tr><td>Val much worse than train immediately</td><td>Train/val preprocessing mismatch</td><td>Verify identical preprocessing (except augmentation)</td></tr>
+  <tr><td>Val mirrors train exactly (zero gap)</td><td>Data leakage / overlap</td><td>Hash IDs to check overlap, verify dataloader</td></tr>
+  <tr><td>Train loss higher than val loss</td><td>Dropout/augmentation active only in training</td><td>Normal! Check train() vs eval() modes are correct</td></tr>
+</table>
+
+<h2 id="hyperparameter-tuning">Hyperparameter Tuning</h2>
+
+<h3>Sensitivity Ranking</h3>
+<table>
+  <tr><th>Hyperparameter</th><th>Sensitivity</th></tr>
+  <tr><td>Learning rate</td><td><strong>High</strong></td></tr>
+  <tr><td>Learning rate schedule</td><td><strong>High</strong></td></tr>
+  <tr><td>Loss function</td><td><strong>High</strong></td></tr>
+  <tr><td>Layer size</td><td><strong>High</strong></td></tr>
+  <tr><td>Model depth</td><td>Medium</td></tr>
+  <tr><td>Weight initialization</td><td>Medium</td></tr>
+  <tr><td>Regularization weight</td><td>Medium</td></tr>
+  <tr><td>Kernel size</td><td>Medium</td></tr>
+  <tr><td>Optimizer choice</td><td>Low</td></tr>
+  <tr><td>Batch size</td><td>Low</td></tr>
+  <tr><td>Nonlinearity</td><td>Low</td></tr>
+</table>
+
+<h3>Tuning Methods</h3>
+<ol>
+  <li><strong>Manual:</strong> Requires understanding of algorithm. Most efficient for experts.</li>
+  <li><strong>Grid search:</strong> Simple, exhaustive. Expensive with many hyperparameters.</li>
+  <li><strong>Random search:</strong> Often better than grid (explores more of each dimension independently).</li>
+  <li><strong>Coarse-to-fine:</strong> Random search, then zoom into promising regions. <em>Most used in practice.</em></li>
+  <li><strong>Bayesian optimization:</strong> Maintains a probabilistic model of performance. Most efficient but harder to set up.</li>
+</ol>
+
+<h2 id="experiment-tracking">Experiment Tracking</h2>
+<p>Options: TensorBoard (baseline), Weights &amp; Biases (most popular in research), Sacred, Neptune.</p>
+</section>
+
+<section id="page-transformers" class="page-section" style="display:none">
+<h1>Transformers</h1>
+<p><strong>Lectures:</strong> L08&ndash;L10 &bull; <strong>Prince:</strong> Chapter 12</p>
+
+<h2 id="motivation">Design Motivation</h2>
+<p>Originally designed for NLP. Three requirements:</p>
+<ol>
+  <li><strong>Compute efficiency:</strong> process hundreds/thousands of interconnected words encoded as high-dimensional vectors</li>
+  <li><strong>Length generalization:</strong> handle variable-length input sequences</li>
+  <li><strong>Attention:</strong> attend to specific parts of earlier text for context (possibly very far away)</li>
+</ol>
+
+<h2 id="tokenization">Tokenization</h2>
+<p>Convert text to a sequence of integer indices, each mapped to a learned embedding vector.</p>
+
+<h3>Tokenization Levels</h3>
+<table>
+  <tr><th>Level</th><th>Pros</th><th>Cons</th></tr>
+  <tr><td><strong>Word-level</strong></td><td>Simple, intuitive</td><td>Large vocabulary, OOV problems</td></tr>
+  <tr><td><strong>Character-level</strong></td><td>Handles any text</td><td>Very long sequences, slow</td></tr>
+  <tr><td><strong>Subword (BPE)</strong></td><td>Balance of granularity and efficiency</td><td>More complex</td></tr>
+</table>
+
+<h3>Byte Pair Encoding (BPE)</h3>
+<ol>
+  <li>Start with character-level tokens</li>
+  <li>Count pair frequencies across the corpus</li>
+  <li>Merge the most frequent pair into a new token</li>
+  <li>Repeat until desired vocabulary size</li>
+</ol>
+<p>Example: "low lower lowest" &rarr; merge (l,o)&rarr;LO, (LO,w)&rarr;LOW &rarr; vocabulary = {LOW, <space>, e, r, s, t}</p>
+
+<h2 id="embeddings">Embeddings</h2>
+<p>Each token index is looked up in a learned embedding matrix to produce a dense vector. These embeddings capture semantic relationships in a continuous space.</p>
+
+<h2 id="self-attention">Self-Attention</h2>
+
+<p>The core mechanism of transformers. For a sequence of vectors $\{\mathbf{x}_1, \ldots, \mathbf{x}_n\}$:</p>
+
+<h3>Queries, Keys, and Values</h3>
+<p>Each input vector $\mathbf{x}_i$ is projected into three different representations:</p>
+<div class="formula">
+$$\mathbf{q}_i = \mathbf{W}_Q \mathbf{x}_i, \quad \mathbf{k}_i = \mathbf{W}_K \mathbf{x}_i, \quad \mathbf{v}_i = \mathbf{W}_V \mathbf{x}_i$$
+</div>
+
+<h3>Attention Weights</h3>
+<p>Compute how much each position $j$ should contribute to position $i$:</p>
+<div class="formula">
+$$a_{ij} = \text{softmax}_j\!\left(\frac{\mathbf{q}_i \cdot \mathbf{k}_j}{\sqrt{d_k}}\right)$$
+</div>
+<p>Divide by $\sqrt{d_k}$ to keep variance unit-scale (prevents softmax saturation).</p>
+
+<h3>Output</h3>
+<div class="formula">
+$$\text{output}_i = \sum_{j=1}^{n} a_{ij} \, \mathbf{v}_j$$
+</div>
+
+<div class="key-concept">
+  <strong>Intuition:</strong> Each position $i$ "queries" all positions $j$. The dot product $\mathbf{q}_i \cdot \mathbf{k}_j$ measures compatibility. The output is a weighted average of values, where the weights come from the query-key compatibility.
+</div>
+
+<h3>Matrix Form</h3>
+<div class="formula">
+$$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\!\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_k}}\right)\mathbf{V}$$
+</div>
+
+<h2 id="multi-head">Multi-Head Attention</h2>
+<p>Run $H$ independent attention heads in parallel, each with its own $\mathbf{W}_Q^h, \mathbf{W}_K^h, \mathbf{W}_V^h$, then concatenate and project:</p>
+<div class="formula">
+$$\text{MultiHead}(\mathbf{X}) = \text{Concat}(\text{head}_1, \ldots, \text{head}_H) \cdot \mathbf{W}_O$$
+</div>
+<p>Each head attends to different features/relationships (analogous to multiple CNN channels).</p>
+
+<h2 id="positional-encoding">Positional Encodings</h2>
+<p>Self-attention has <strong>no built-in notion of position</strong>. Solution: add or concatenate position information to the embeddings.</p>
+
+<h3>Sinusoidal Positional Encodings</h3>
+<p>Fixed encodings using sine and cosine functions at different frequencies. The periodic nature captures relative positions, acting as a "ruler" for attention.</p>
+
+<h3>Learned Positional Embeddings</h3>
+<p>A separate embedding table mapping position indices to vectors. More flexible but limited to a maximum sequence length.</p>
+
+<h2 id="transformer-block">The Transformer Block</h2>
+<p>Each block applies (with residual connections and layer normalization):</p>
+<pre><code>x &rarr; LayerNorm &rarr; Multi-Head Attention &rarr; (+x) &rarr; LayerNorm &rarr; MLP (Feed-Forward) &rarr; (+x)</code></pre>
+
+<p>The MLP (feed-forward network) is applied independently to each position. It typically expands dimensions (e.g., 4&times;) and then contracts back.</p>
+
+<h2 id="architectures">Transformer Architectures</h2>
+
+<table class="comparison">
+  <tr><th>Architecture</th><th>Type</th><th>Masking</th><th>Use Case</th></tr>
+  <tr><td><strong>BERT</strong></td><td>Encoder-only</td><td>Bidirectional (no mask)</td><td>Understanding tasks (classification, NER)</td></tr>
+  <tr><td><strong>GPT</strong></td><td>Decoder-only</td><td>Causal mask (can only attend to past)</td><td>Text generation, LLMs</td></tr>
+  <tr><td><strong>Original Transformer</strong></td><td>Encoder-Decoder</td><td>Cross-attention between encoder and decoder</td><td>Translation</td></tr>
+</table>
+
+<h3>Encoder-Only (BERT)</h3>
+<ul>
+  <li>Bidirectional: each token can attend to all others</li>
+  <li>Pre-trained with masked language modeling (predict randomly masked tokens)</li>
+  <li>Fine-tuned on downstream tasks</li>
+</ul>
+
+<h3>Decoder-Only (GPT)</h3>
+<ul>
+  <li>Autoregressive: each token can only attend to itself and previous tokens</li>
+  <li>Causal masking: set future attention weights to $-\infty$ before softmax</li>
+  <li>The final token's embedding is used for next-token prediction</li>
+</ul>
+
+<h3>Cross-Attention</h3>
+<p>Used in encoder-decoder models. The decoder's queries attend to the encoder's keys and values, allowing the decoder to condition on the full input sequence.</p>
+
+<h2 id="vit">Vision Transformers (ViT)</h2>
+<ul>
+  <li>Split images into fixed-size patches (e.g., 16&times;16)</li>
+  <li>Flatten each patch and embed it as a token</li>
+  <li>Add positional embeddings</li>
+  <li>Process through standard transformer blocks</li>
+  <li>Self-attention captures long-range dependencies across the entire image</li>
+</ul>
+</section>
+
+<section id="page-llms" class="page-section" style="display:none">
+<h1>LLMs &amp; Decoding Strategies</h1>
+<p><strong>Lecture:</strong> L11 &bull; <strong>Prince:</strong> Chapter 12 (partial)</p>
+
+<h2 id="decoder-only">Decoder-Only Transformers</h2>
+<p>The most common LLM architecture (GPT, LLaMA, Mixtral). Each token attends only to itself and previous tokens via <strong>causal masking</strong>. The final token's contextualized embedding is mapped to a probability distribution over the vocabulary.</p>
+
+<h2 id="decoding">From Vectors to Words</h2>
+<p>The transformer outputs a vector for the final position. An MLP (or single linear layer) + softmax converts this to a probability distribution over the vocabulary:</p>
+<div class="formula">
+$$P(w_i) = \text{softmax}(\mathbf{W}_\text{head} \cdot \mathbf{h}_\text{final} + \mathbf{b})_i$$
+</div>
+
+<h2 id="strategies">Decoding Strategies</h2>
+
+<h3>Greedy Search (Argmax)</h3>
+<p>Select the most probable token at each step. Simple and fast, but produces repetitive, predictable text.</p>
+
+<h3>Beam Search</h3>
+<p>Maintain $B$ candidate sequences (beams) at each step. Expand each by all vocabulary tokens, keep top-$B$ by cumulative probability. Produces more coherent output than greedy.</p>
+
+<h3>Temperature Sampling</h3>
+<p>Sharpen or flatten the distribution before sampling:</p>
+<div class="formula">
+$$P(w_i) = \frac{e^{z_i / T}}{\sum_j e^{z_j / T}}$$
+</div>
+<ul>
+  <li>$T = 1$: standard sampling</li>
+  <li>$T < 1$: sharper distribution &rArr; more deterministic, coherent</li>
+  <li>$T > 1$: flatter distribution &rArr; more random, creative</li>
+  <li>$T \to 0$: converges to greedy (argmax)</li>
+</ul>
+
+<h3>Top-k Sampling</h3>
+<p>Restrict sampling to only the top $k$ most probable tokens. Reduces nonsensical outputs while maintaining diversity.</p>
+
+<h3>Top-p (Nucleus) Sampling</h3>
+<p>Choose the smallest set of tokens whose cumulative probability exceeds threshold $p$. More adaptive than top-k: narrows or widens dynamically based on the model's confidence.</p>
+
+<h2 id="advanced-decoding">Advanced Decoding</h2>
+
+<h3>Speculative Decoding</h3>
+<ol>
+  <li>A smaller, faster model generates candidate tokens speculatively</li>
+  <li>The large model verifies these tokens <strong>in parallel</strong></li>
+  <li>Accept correct tokens; regenerate from the first mistake</li>
+</ol>
+<p>Significant speedup without compromising output quality.</p>
+
+<h3>Structured Decoding</h3>
+<p>Constrain the LLM to produce specific output formats (JSON, multiple choice, regex patterns) by filtering the vocabulary at each step. Libraries like <code>outlines</code> implement this.</p>
+
+<h2 id="rag">Retrieval-Augmented Generation (RAG)</h2>
+<p>Combines retrieval with generation to address hallucinations and factual inaccuracy:</p>
+<ol>
+  <li>Convert the query into an embedding</li>
+  <li>Retrieve relevant documents via nearest-neighbor search in embedding space</li>
+  <li>Prepend retrieved documents as context for the LLM</li>
+</ol>
+<p>Retrieval is based on <strong>semantic similarity</strong> (embedding dot products), not just keyword matching.</p>
+
+<h2 id="multimodal">Multimodal LLMs</h2>
+<p>Process multiple modalities (text, images, audio) within a single model by converting everything to tokens.</p>
+
+<h3>Vision Transformers (ViT)</h3>
+<p>Treat image patches as tokens. Flatten, embed, add positional encodings, process with transformer blocks.</p>
+
+<h3>CLIP (Contrastive Language-Image Pretraining)</h3>
+<p>Trained on image-text pairs using contrastive learning:</p>
+<div class="formula">
+$$\mathcal{L} = -\frac{1}{2N}\sum_{i=1}^{N}\left[\log\frac{\exp(\mathbf{v}_i^\top \mathbf{u}_i)}{\sum_j \exp(\mathbf{v}_i^\top \mathbf{u}_j)} + \log\frac{\exp(\mathbf{v}_i^\top \mathbf{u}_i)}{\sum_j \exp(\mathbf{v}_j^\top \mathbf{u}_i)}\right]$$
+</div>
+<p>where $\mathbf{v}_i$ = image embedding, $\mathbf{u}_i$ = text embedding. Matches images with their correct text descriptions in a shared space. Enables <strong>zero-shot classification</strong>: compare image embedding against text embeddings of candidate labels.</p>
+
+<h2 id="summary-decoding">Summary: Decoding Tradeoffs</h2>
+<table class="comparison">
+  <tr><th>Method</th><th>Fluency</th><th>Coherence</th><th>Diversity</th><th>Speed</th></tr>
+  <tr><td>Greedy</td><td>Medium</td><td>High</td><td>Low</td><td>Fast</td></tr>
+  <tr><td>Beam search</td><td>High</td><td>High</td><td>Low</td><td>Moderate</td></tr>
+  <tr><td>Temperature</td><td>Varies</td><td>Varies</td><td>High (high T)</td><td>Fast</td></tr>
+  <tr><td>Top-k</td><td>Good</td><td>Good</td><td>Moderate</td><td>Fast</td></tr>
+  <tr><td>Top-p</td><td>Good</td><td>Good</td><td>Adaptive</td><td>Fast</td></tr>
+</table>
+</section>
+
+<section id="page-rl-foundations" class="page-section" style="display:none">
+<h1>Reinforcement Learning Foundations</h1>
+<p><strong>Lectures:</strong> L12&ndash;L13 &bull; <strong>Prince:</strong> Chapter 19</p>
+
+<h2 id="overview">Overview</h2>
+<p>RL is a <strong>sequential decision-making</strong> framework. An agent interacts with an environment to maximize cumulative reward.</p>
+
+<p>At each time step $t$:</p>
+<ol>
+  <li>Agent observes state $s_t$</li>
+  <li>Agent takes action $a_t$</li>
+  <li>Environment returns reward $r_{t+1}$ and next state $s_{t+1}$</li>
+</ol>
+
+<h2 id="mdp">Markov Decision Processes</h2>
+
+<p>An MDP is defined by the tuple $(S, A, \Pr(s_{t+1}, r_{t+1} \mid s_t, a_t), \gamma)$:</p>
+<table>
+  <tr><th>Component</th><th>Meaning</th></tr>
+  <tr><td>$S$</td><td>State space</td></tr>
+  <tr><td>$A$</td><td>Action space</td></tr>
+  <tr><td>$\Pr(s', r \mid s, a)$</td><td>Transition dynamics (may be unknown)</td></tr>
+  <tr><td>$\gamma \in (0, 1]$</td><td>Discount factor (larger = more far-sighted)</td></tr>
+</table>
+
+<div class="key-concept">
+  <strong>Markov Property:</strong> The future depends only on the current state, not on the full history: $\Pr(s_{t+1} \mid s_t, a_t) = \Pr(s_{t+1} \mid s_1, a_1, \ldots, s_t, a_t)$.
+</div>
+
+<h3>Building Blocks: MP &rarr; MRP &rarr; MDP</h3>
+<ul>
+  <li><strong>Markov Process (MP):</strong> states + transitions only (no actions, no rewards)</li>
+  <li><strong>Markov Reward Process (MRP):</strong> add reward function $r[s]$</li>
+  <li><strong>MDP:</strong> add actions &mdash; agent can influence transitions</li>
+</ul>
+
+<h2 id="return">Return and Discount</h2>
+
+<p>The <strong>return</strong> from time $t$ is the discounted sum of future rewards:</p>
+<div class="formula">
+$$G_t = \sum_{k=0}^{\infty} \gamma^k \, r_{t+k+1}$$
+</div>
+<p>$\gamma < 1$ ensures the sum converges and makes the agent prefer sooner rewards.</p>
+
+<h2 id="policy">Policy</h2>
+
+<p>A policy $\pi$ dictates the agent's behavior:</p>
+<ul>
+  <li><strong>Deterministic:</strong> $a = \pi(s)$</li>
+  <li><strong>Stochastic:</strong> $\pi[a \mid s] = \Pr(a \mid s)$</li>
+</ul>
+<p>Goal: find the <strong>optimal policy</strong> $\pi^*$ that maximizes expected return.</p>
+
+<h2 id="value-functions">Value Functions</h2>
+
+<h3>State-Value Function</h3>
+<div class="formula">
+$$v[s \mid \pi] = \mathbb{E}_\pi[G_t \mid s_t = s]$$
+</div>
+<p>Expected return when starting in state $s$ and following policy $\pi$.</p>
+
+<h3>Action-Value Function</h3>
+<div class="formula">
+$$q[s, a \mid \pi] = \mathbb{E}_\pi[G_t \mid s_t = s, a_t = a]$$
+</div>
+<p>Expected return when starting in $s$, taking action $a$, then following $\pi$.</p>
+
+<h3>Relationships Between $v$ and $q$</h3>
+<div class="formula">
+$$v[s] = \sum_a \pi[a \mid s] \cdot q[s, a] \quad \text{(v from q: average over policy)}$$
+</div>
+<div class="formula">
+$$q[s, a] = r[s, a] + \gamma \sum_{s'} \Pr(s' \mid s, a) \, v[s'] \quad \text{(q from v: one-step lookahead)}$$
+</div>
+
+<h2 id="bellman">Bellman Equations</h2>
+
+<p>Self-consistency constraints that any value function must satisfy:</p>
+
+<h3>Bellman Equation for $q$</h3>
+<div class="formula">
+$$q[s_t, a_t] = r[s_t, a_t] + \gamma \, \mathbb{E}_{s_{t+1}} \left[ \mathbb{E}_{a_{t+1} \sim \pi} \left[ q[s_{t+1}, a_{t+1}] \right] \right]$$
+</div>
+
+<p>In words: the value of taking action $a$ in state $s$ equals (1) the immediate reward, plus (2) the discounted expected value of the next state-action pair.</p>
+
+<h3>Bellman Optimality Equation</h3>
+<p>For the optimal policy, replace "expected action under $\pi$" with "best action":</p>
+<div class="formula">
+$$q^*[s, a] = r[s, a] + \gamma \sum_{s'} \Pr(s' \mid s, a) \max_{a'} q^*[s', a']$$
+</div>
+
+<div class="admonition note">
+  <div class="admonition-title">Key Insight</div>
+  <p>The Bellman equations create a "ripple effect": changing $v[s]$ affects values of predecessor states. Many RL algorithms are methods to solve or approximate these equations.</p>
+</div>
+
+<h2 id="exploration">Exploration vs Exploitation</h2>
+<ul>
+  <li><strong>Exploitation:</strong> choose actions that currently look best</li>
+  <li><strong>Exploration:</strong> try actions that might reveal higher long-term return</li>
+  <li>You cannot learn $q(s,a)$ for actions you never take!</li>
+</ul>
+
+<h3>Exploration Strategies</h3>
+<table>
+  <tr><th>Strategy</th><th>Description</th></tr>
+  <tr><td>$\epsilon$-greedy</td><td>With probability $\epsilon$ take random action, else greedy</td></tr>
+  <tr><td>Softmax/Boltzmann</td><td>Sample proportional to $\exp(q/\tau)$</td></tr>
+  <tr><td>Optimistic initialization</td><td>Start $q$ high to encourage trying all actions</td></tr>
+</table>
+
+<h2 id="model-based-vs-free">Model-Based vs Model-Free</h2>
+<table class="comparison">
+  <tr><th>Approach</th><th>Knows</th><th>Method</th></tr>
+  <tr><td><strong>Model-based</strong></td><td>$\Pr(s'|s,a)$ and $r[s,a]$</td><td>Dynamic programming (planning)</td></tr>
+  <tr><td><strong>Model-free</strong></td><td>Only samples $(s, a, r, s')$</td><td>Monte Carlo, TD learning, Q-learning</td></tr>
+</table>
+</section>
+
+<section id="page-rl-algorithms" class="page-section" style="display:none">
+<h1>RL Algorithms</h1>
+<p><strong>Lectures:</strong> L14&ndash;L15 &bull; <strong>Prince:</strong> Chapter 19</p>
+
+<h2 id="tabular">Tabular RL</h2>
+<p>When $|S|$ and $|A|$ are small enough to store $v[s]$ or $q[s,a]$ in a table.</p>
+
+<h3 id="dp">Dynamic Programming (Model Known)</h3>
+<p><strong>Policy Iteration:</strong></p>
+<ol>
+  <li><strong>Policy Evaluation:</strong> Compute $v[s]$ for current policy $\pi$ by sweeping through states and applying Bellman backups until convergence</li>
+  <li><strong>Policy Improvement:</strong> Greedily update $\pi(s) \leftarrow \arg\max_a q[s,a]$</li>
+  <li>Repeat until policy stops changing</li>
+</ol>
+
+<p><strong>Value Iteration:</strong> Directly apply Bellman optimality:</p>
+<div class="formula">
+$$v[s] \leftarrow \max_a \left( r[s,a] + \gamma \sum_{s'} \Pr(s'|s,a) \, v[s'] \right)$$
+</div>
+<p>Simpler than policy iteration. The greedy policy at convergence is optimal.</p>
+
+<h3 id="mc">Monte Carlo Methods (Model Unknown)</h3>
+<p>Estimate values by averaging <strong>complete returns</strong> from sampled episodes.</p>
+<ul>
+  <li>No bootstrapping (don't use value estimates in the update)</li>
+  <li><strong>Pros:</strong> unbiased targets</li>
+  <li><strong>Cons:</strong> high variance; must wait until episode ends</li>
+</ul>
+<p>MC control loop:</p>
+<ol>
+  <li>Generate episodes using current policy (with $\epsilon$-greedy for exploration)</li>
+  <li>For each visited $(s,a)$, compute empirical return</li>
+  <li>Update $q[s,a]$ as the average of observed returns</li>
+  <li>Improve policy greedily</li>
+</ol>
+
+<h3 id="td">Temporal Difference (TD) Learning</h3>
+<p>Combines strengths of DP and MC: learns from experience (like MC) but bootstraps (like DP).</p>
+
+<h4>TD Error</h4>
+<div class="formula">
+$$\delta_t = r_{t+1} + \gamma \, v[s_{t+1}] - v[s_t]$$
+</div>
+<p>Measures the discrepancy between the current estimate and the one-step-ahead estimate.</p>
+
+<h4>SARSA (On-Policy TD)</h4>
+<div class="formula">
+$$q[s_t, a_t] \leftarrow q[s_t, a_t] + \alpha \left( r_{t+1} + \gamma \, q[s_{t+1}, a_{t+1}] - q[s_t, a_t] \right)$$
+</div>
+<p>Uses the <strong>actual next action</strong> $a_{t+1}$ sampled from $\pi$. Good when you care about safety during exploration.</p>
+
+<h4>Q-Learning (Off-Policy TD)</h4>
+<div class="formula">
+$$q[s_t, a_t] \leftarrow q[s_t, a_t] + \alpha \left( r_{t+1} + \gamma \max_{a'} q[s_{t+1}, a'] - q[s_t, a_t] \right)$$
+</div>
+<p>Uses $\max_{a'}$ instead of the actual next action. The behavior policy can explore freely while learning the optimal $q$-function.</p>
+
+<table class="comparison">
+  <tr><th></th><th>SARSA</th><th>Q-Learning</th></tr>
+  <tr><td>Policy</td><td>On-policy</td><td>Off-policy</td></tr>
+  <tr><td>Target action</td><td>$a_{t+1} \sim \pi$</td><td>$\arg\max_{a'} q[s_{t+1}, a']$</td></tr>
+  <tr><td>Learns value of</td><td>Current (exploratory) policy</td><td>Optimal greedy policy</td></tr>
+  <tr><td>Speed</td><td>Can be slower</td><td>Often faster</td></tr>
+  <tr><td>Stability</td><td>More stable</td><td>Can be less stable</td></tr>
+</table>
+
+<h2 id="deep-rl">Deep RL: Function Approximation</h2>
+<p>When $|S|$ is too large for tables (e.g., images), approximate $q[s,a]$ with a neural network $q[s, a, \boldsymbol{\phi}]$.</p>
+
+<h3>Fitted Q-Learning</h3>
+<ol>
+  <li>Collect transitions: $\mathcal{D} = \{(s_t, a_t, r_{t+1}, s_{t+1})\}$</li>
+  <li>Define target: $y_t = r_{t+1} + \gamma \max_{a'} q[s_{t+1}, a', \boldsymbol{\phi}]$</li>
+  <li>Minimize: $\mathcal{L} = \sum_t (q[s_t, a_t, \boldsymbol{\phi}] - y_t)^2$</li>
+</ol>
+
+<div class="admonition warning">
+  <div class="admonition-title">Instability: The Deadly Triad</div>
+  <p>Fitted Q-learning can be unstable due to three factors:</p>
+  <ol>
+    <li><strong>Moving target:</strong> $y_t$ depends on $\boldsymbol{\phi}$, which keeps changing</li>
+    <li><strong>Correlated samples:</strong> consecutive transitions are similar</li>
+    <li><strong>Off-policy + function approximation + bootstrapping</strong></li>
+  </ol>
+</div>
+
+<h3 id="dqn">Deep Q-Network (DQN)</h3>
+<p>Stabilizers that make deep Q-learning work:</p>
+<ul>
+  <li><strong>Experience replay:</strong> store transitions in a buffer; sample random mini-batches (breaks correlation)</li>
+  <li><strong>Target network:</strong> maintain frozen parameters $\boldsymbol{\phi}^-$ for computing targets; update periodically (stabilizes targets)</li>
+  <li><strong>Frame stacking:</strong> stack recent frames to handle partial observability</li>
+  <li><strong>$\epsilon$-greedy exploration</strong></li>
+</ul>
+
+<p>Architecture: a CNN maps stacked Atari frames to $q[s, a]$ for each discrete action.</p>
+
+<h3>Double DQN</h3>
+<p>Standard Q-learning overestimates values because $\max$ is biased. Fix: use one network to <strong>select</strong> the action, another to <strong>evaluate</strong> it:</p>
+<div class="formula">
+$$y_t = r_{t+1} + \gamma \, q\!\left[s_{t+1}, \arg\max_{a'} q[s_{t+1}, a', \boldsymbol{\phi}], \boldsymbol{\phi}^-\right]$$
+</div>
+
+<h2 id="policy-gradient">Policy Gradient Methods</h2>
+<p>Instead of learning $q$ and acting via argmax, directly optimize the policy $\pi[a \mid s, \boldsymbol{\theta}]$.</p>
+
+<div class="admonition note">
+  <div class="admonition-title">When to Use Policy Gradients</div>
+  <p>Value-based methods (Q-learning) require $\arg\max_a q(s,a)$, which is hard with continuous action spaces. Policy gradient methods work naturally with continuous actions.</p>
+</div>
+
+<h3>REINFORCE</h3>
+<p>The simplest policy gradient algorithm. The gradient of the expected return is:</p>
+<div class="formula">
+$$\nabla_\theta J(\theta) = \mathbb{E}_\pi \left[ \sum_t \nabla_\theta \log \pi[a_t \mid s_t, \theta] \cdot G_t \right]$$
+</div>
+<p>Increase probability of actions that led to high returns; decrease for low returns.</p>
+
+<h3>Actor-Critic</h3>
+<p>Use a <strong>critic</strong> (value network) to reduce variance of the policy gradient:</p>
+<ul>
+  <li><strong>Actor:</strong> policy network $\pi[a \mid s, \theta]$</li>
+  <li><strong>Critic:</strong> value network $v[s, \mathbf{w}]$</li>
+  <li>Replace $G_t$ with the <strong>advantage</strong>: $A_t = G_t - v[s_t]$ (or use TD error)</li>
+</ul>
+
+<h2 id="algo-taxonomy">Algorithm Taxonomy</h2>
+<table class="comparison">
+  <tr><th>Family</th><th>Learns</th><th>Examples</th><th>Action Space</th></tr>
+  <tr><td>Value-based</td><td>$q$ or $v$, act via argmax</td><td>Q-learning, DQN, Double DQN</td><td>Discrete</td></tr>
+  <tr><td>Policy-based</td><td>$\pi$ directly</td><td>REINFORCE</td><td>Any</td></tr>
+  <tr><td>Actor-Critic</td><td>Both $\pi$ and $v$</td><td>A2C, PPO</td><td>Any</td></tr>
+</table>
+</section>
+
+<section id="page-pgm" class="page-section" style="display:none">
+<h1>Probabilistic Graphical Models</h1>
+<p><strong>Lecture:</strong> L16 (+ start of L17) &bull; <strong>Source:</strong> Lecture notes only (not in Prince)</p>
+
+<h2 id="core-idea">Core Idea</h2>
+<div class="key-concept">
+  <strong>A PGM is a compact visual representation of a factorized joint distribution.</strong> It communicates causal/dependency assumptions and keeps you honest about what you're assuming about the world.
+</div>
+
+<h2 id="directed-pgm">Directed PGMs (Bayesian Networks)</h2>
+
+<p>A directed PGM is a picture of a product of conditional probabilities:</p>
+<div class="formula">
+$$\Pr(x_1, x_2, \ldots, x_K) = \prod_{k=1}^{K} \Pr\!\left(x_k \mid \text{parents}(X_k)\right)$$
+</div>
+
+<p><strong>Rules:</strong></p>
+<ul>
+  <li>One factor per node: "node given its parents"</li>
+  <li>Arrows go from cause &rarr; effect</li>
+  <li>Arrows encode which variables each conditional is allowed to depend on</li>
+</ul>
+
+<h3>Example: Wet Grass</h3>
+<p>$R$ = rain, $S$ = sprinkler, $W$ = wet grass</p>
+<div class="formula">
+$$\Pr(R, S, W) = \Pr(R) \cdot \Pr(S) \cdot \Pr(W \mid R, S)$$
+</div>
+<p>Given $W=1$ (grass is wet), we can compute the posterior $\Pr(R, S \mid W=1)$ using Bayes' rule.</p>
+
+<h2 id="notation">Visual Notation</h2>
+<table>
+  <tr><th>Symbol</th><th>Meaning</th></tr>
+  <tr><td>White (open) circle</td><td>Latent variable (unobserved)</td></tr>
+  <tr><td>Shaded circle</td><td>Observed variable (data)</td></tr>
+  <tr><td>Small filled dot / no circle</td><td>Deterministic / fixed parameter</td></tr>
+  <tr><td>Box with $n = 1{:}N$</td><td>Plate: repeated structure (N copies)</td></tr>
+</table>
+
+<h2 id="workflow">Two-Phase Workflow</h2>
+<ol>
+  <li><strong>Describe the generative model:</strong> What causes what? What are the latent variables and parameters? Write down the forward probabilistic story.</li>
+  <li><strong>Decide how to compute:</strong> Exact conjugacy (tiny models), optimization (MLE/MAP), variational inference, MCMC, etc. These methods take the joint (or log joint) as input.</li>
+</ol>
+
+<div class="admonition warning">
+  <div class="admonition-title">Common Mistake</div>
+  <p>Don't draw arrows from data to parameters! "$\mu$ computed from data" is an <em>algorithm</em>. The PGM must encode the <strong>generative story</strong>: parameters &rarr; data. Inference goes the other direction computationally, but the graph doesn't.</p>
+</div>
+
+<h2 id="probability-refresher">Probability Refresher</h2>
+
+<h3>Key Rules</h3>
+<div class="formula">
+$$\text{Marginalisation: } \Pr(x) = \int \Pr(x, y) \, dy$$
+</div>
+<div class="formula">
+$$\text{Conditional: } \Pr(a \mid b) = \frac{\Pr(a, b)}{\Pr(b)}$$
+</div>
+<div class="formula">
+$$\text{Bayes: } \Pr(\omega \mid \mathcal{D}) = \frac{\Pr(\mathcal{D} \mid \omega) \, \Pr(\omega)}{\Pr(\mathcal{D})}$$
+</div>
+
+<h3>Bayes Rule: The Main Story of ML</h3>
+<table>
+  <tr><th>Term</th><th>Role</th></tr>
+  <tr><td>$\Pr(\omega)$</td><td>Prior: what you know about parameters before seeing data</td></tr>
+  <tr><td>$\Pr(\mathcal{D} \mid \omega)$</td><td>Likelihood: how well parameters explain the data</td></tr>
+  <tr><td>$\Pr(\omega \mid \mathcal{D})$</td><td>Posterior: updated belief after seeing data</td></tr>
+  <tr><td>$\Pr(\mathcal{D})$</td><td>Evidence: normalizing constant</td></tr>
+</table>
+
+<h2 id="mle-map">MLE vs MAP</h2>
+<div class="formula">
+$$\hat{\omega}_\text{MLE} = \arg\max_\omega \Pr(\mathcal{D} \mid \omega)$$
+</div>
+<div class="formula">
+$$\hat{\omega}_\text{MAP} = \arg\max_\omega \Pr(\mathcal{D} \mid \omega) \, \Pr(\omega)$$
+</div>
+<p>MAP = MLE + prior. Adding a Gaussian prior &harr; L2 regularization. Adding a Laplace prior &harr; L1 regularization.</p>
+
+<h2 id="coin-example">Example: Coin Flipping</h2>
+<p>Parameter $\omega$ (bias), observations $x_1, \ldots, x_N$ where $x_i \in \{0, 1\}$. Plate notation with conditionally independent flips:</p>
+<div class="formula">
+$$\Pr(\omega, x_{1:N}) = \Pr(\omega) \prod_{n=1}^{N} \Pr(x_n \mid \omega)$$
+</div>
+<p>Posterior via Bayes: $\Pr(\omega \mid x_{1:N}) \propto \Pr(\omega) \prod_{n=1}^N \Pr(x_n \mid \omega)$</p>
+
+<h2 id="directed-vs-undirected">Directed vs Undirected PGMs</h2>
+<table>
+  <tr><th></th><th>Directed (Bayesian Networks)</th><th>Undirected (Markov Random Fields)</th></tr>
+  <tr><td>Edges</td><td>Arrows (causal story)</td><td>No arrows (symmetric dependence)</td></tr>
+  <tr><td>Factorization</td><td>Product of conditionals</td><td>Product of potential functions / partition function</td></tr>
+  <tr><td>Focus of this course</td><td>Yes</td><td>Briefly mentioned</td></tr>
+</table>
+
+<div class="admonition tip">
+  <div class="admonition-title">Connection to Rest of Course</div>
+  <p>PGMs provide the foundation for understanding VAEs, diffusion models, and other latent variable models. The generative story (PGM) defines the joint distribution, and inference methods (variational inference, ELBO) are used when exact posterior computation is intractable.</p>
+</div>
+</section>
+
+<section id="page-vae" class="page-section" style="display:none">
+<h1>Variational Autoencoders</h1>
+<p><strong>Lecture:</strong> L17 &bull; <strong>Prince:</strong> Chapter 17</p>
+
+<h2 id="latent-variable">Latent Variable Models</h2>
+<p>The idea: model hidden causes $\mathbf{z}$ that explain the observed data $\mathbf{x}$.</p>
+<ul>
+  <li><strong>Prior:</strong> $\Pr(\mathbf{z}) = \mathcal{N}(\mathbf{0}, \mathbf{I})$ (standard normal)</li>
+  <li><strong>Decoder (generative model):</strong> $\Pr(\mathbf{x} \mid \mathbf{z}, \boldsymbol{\phi}) = \mathcal{N}(\mathbf{x}; f[\mathbf{z}, \boldsymbol{\phi}], \sigma^2\mathbf{I})$</li>
+  <li><strong>Marginal likelihood:</strong> $\Pr(\mathbf{x} \mid \boldsymbol{\phi}) = \int \Pr(\mathbf{x} \mid \mathbf{z}, \boldsymbol{\phi}) \, \Pr(\mathbf{z}) \, d\mathbf{z}$</li>
+</ul>
+
+<div class="admonition important">
+  <div class="admonition-title">The Problem</div>
+  <p>The marginal likelihood integral is <strong>intractable</strong> for nonlinear decoders (neural networks). We cannot compute it exactly because the integral has no closed form.</p>
+</div>
+
+<h2 id="elbo">The ELBO (Evidence Lower Bound)</h2>
+
+<h3>Derivation Step 1: Introduce $q(\mathbf{z})$</h3>
+<p>Multiply and divide by an auxiliary distribution $q(\mathbf{z})$ inside the log-likelihood:</p>
+<div class="formula">
+$$\log \Pr(\mathbf{x} \mid \boldsymbol{\phi}) = \log \int \frac{\Pr(\mathbf{x}, \mathbf{z} \mid \boldsymbol{\phi})}{q(\mathbf{z})} q(\mathbf{z}) \, d\mathbf{z}$$
+</div>
+
+<h3>Step 2: Apply Jensen's Inequality</h3>
+<p>Since $\log$ is concave, push it inside the expectation:</p>
+<div class="formula">
+$$\log \Pr(\mathbf{x} \mid \boldsymbol{\phi}) \geq \mathbb{E}_{q(\mathbf{z})}\!\left[\log \frac{\Pr(\mathbf{x}, \mathbf{z} \mid \boldsymbol{\phi})}{q(\mathbf{z})}\right] = \text{ELBO}$$
+</div>
+
+<h3>The Gap: KL Divergence</h3>
+<div class="formula">
+$$\log \Pr(\mathbf{x}) = \text{ELBO} + D_\text{KL}(q(\mathbf{z}) \| \Pr(\mathbf{z} \mid \mathbf{x}))$$
+</div>
+<p>Since KL $\geq 0$, ELBO $\leq \log \Pr(\mathbf{x})$. The bound is tight when $q(\mathbf{z}) = \Pr(\mathbf{z} \mid \mathbf{x})$ (the true posterior).</p>
+
+<h3>ELBO Decomposition</h3>
+<div class="formula">
+$$\text{ELBO} = \underbrace{\mathbb{E}_{q(\mathbf{z})}\left[\log \Pr(\mathbf{x} \mid \mathbf{z}, \boldsymbol{\phi})\right]}_{\text{Reconstruction term}} - \underbrace{D_\text{KL}(q(\mathbf{z}) \| \Pr(\mathbf{z}))}_{\text{KL to prior (regularization)}}$$
+</div>
+
+<div class="key-concept">
+  <strong>Two terms:</strong>
+  <ol>
+    <li><strong>Reconstruction:</strong> How well can we reconstruct $\mathbf{x}$ from samples of $\mathbf{z}$?</li>
+    <li><strong>KL regularization:</strong> How close is $q(\mathbf{z})$ to the prior $\mathcal{N}(\mathbf{0}, \mathbf{I})$?</li>
+  </ol>
+</div>
+
+<h2 id="vae-architecture">VAE Architecture</h2>
+
+<h3>Encoder (Inference Network)</h3>
+<p>$q(\mathbf{z} \mid \mathbf{x}, \boldsymbol{\theta}) = \mathcal{N}(\boldsymbol{\mu}_\theta(\mathbf{x}), \text{diag}(\boldsymbol{\sigma}_\theta^2(\mathbf{x})))$</p>
+<p>A neural network that maps $\mathbf{x}$ to the parameters $\boldsymbol{\mu}$ and $\boldsymbol{\sigma}^2$ of the approximate posterior. This is <strong>amortized inference</strong>: one forward pass per sample.</p>
+
+<h3>Decoder (Generative Network)</h3>
+<p>$\Pr(\mathbf{x} \mid \mathbf{z}, \boldsymbol{\phi})$: a neural network that maps $\mathbf{z}$ to the parameters of $\Pr(\mathbf{x})$.</p>
+
+<h2 id="reparameterization">The Reparameterization Trick</h2>
+
+<p><strong>Problem:</strong> The ELBO involves an expectation over $q(\mathbf{z} \mid \mathbf{x})$. We need gradients through the sampling operation, but sampling is not differentiable.</p>
+
+<p><strong>Solution:</strong> Separate the randomness from the deterministic computation:</p>
+<div class="formula">
+$$\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$$
+$$\mathbf{z} = \boldsymbol{\mu}_\theta(\mathbf{x}) + \boldsymbol{\sigma}_\theta(\mathbf{x}) \odot \boldsymbol{\epsilon}$$
+</div>
+<p>Now $\mathbf{z}$ is a deterministic function of $\boldsymbol{\mu}, \boldsymbol{\sigma}, \boldsymbol{\epsilon}$, and we can backpropagate through $\boldsymbol{\mu}$ and $\boldsymbol{\sigma}$ to the encoder parameters.</p>
+
+<h2 id="kl-closed-form">Closed-Form KL Term</h2>
+<p>For two Gaussians (approximate posterior vs standard normal prior):</p>
+<div class="formula">
+$$D_\text{KL}\!\left(\mathcal{N}(\boldsymbol{\mu}, \text{diag}(\boldsymbol{\sigma}^2)) \| \mathcal{N}(\mathbf{0}, \mathbf{I})\right) = \frac{1}{2}\sum_{j=1}^{d}\left(\mu_j^2 + \sigma_j^2 - \log \sigma_j^2 - 1\right)$$
+</div>
+
+<h2 id="algorithm">VAE Training Algorithm</h2>
+<ol>
+  <li><strong>Encode:</strong> $\boldsymbol{\mu}, \boldsymbol{\sigma}^2 = \text{Encoder}(\mathbf{x})$</li>
+  <li><strong>Sample:</strong> $\mathbf{z} = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}$, where $\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$</li>
+  <li><strong>Decode:</strong> $\hat{\mathbf{x}} = \text{Decoder}(\mathbf{z})$</li>
+  <li><strong>Compute loss:</strong> $-\text{ELBO} = -\mathbb{E}[\log \Pr(\mathbf{x} \mid \mathbf{z})] + D_\text{KL}(q \| p)$</li>
+  <li><strong>Update:</strong> both encoder ($\boldsymbol{\theta}$) and decoder ($\boldsymbol{\phi}$) with Adam/SGD</li>
+</ol>
+
+<p>In practice, the reconstruction term is estimated with a <strong>single sample</strong> of $\mathbf{z}$ per data point. The KL term is computed in closed form.</p>
+
+<h2 id="optimization-view">Optimization Perspective</h2>
+<ul>
+  <li><strong>Decoder updates</strong> improve model fit (better reconstruction)</li>
+  <li><strong>Encoder updates</strong> tighten the bound (better approximation of true posterior)</li>
+  <li>Both are updated jointly in every mini-batch</li>
+</ul>
+</section>
+
+<section id="page-flows" class="page-section" style="display:none">
+<h1>Normalizing Flows</h1>
+<p><strong>Lecture:</strong> L18 &bull; <strong>Prince:</strong> Chapter 16</p>
+
+<h2 id="motivation">Motivation</h2>
+<p>Unlike VAEs, normalizing flows give us <strong>exact likelihoods</strong> and <strong>exact sampling</strong>. No ELBO approximation needed.</p>
+<ul>
+  <li>Sample $\mathbf{x}$ from a complex distribution</li>
+  <li>Evaluate $\log \Pr(\mathbf{x})$ exactly</li>
+  <li>Key requirement: every layer must be <strong>invertible</strong></li>
+</ul>
+
+<h2 id="1d-intuition">1D Flow Intuition</h2>
+
+<h3>Sampling Direction ($z \to x$)</h3>
+<p>Start from a simple base density $\Pr(\mathbf{z})$ (e.g., Gaussian). Map through an invertible function. Stretching lowers density; compression raises density.</p>
+
+<h3>Likelihood Direction ($x \to z$)</h3>
+<p>Apply the inverse map. A derivative (Jacobian) term corrects for local stretching/compression.</p>
+
+<h2 id="change-of-variables">Change of Variables Formula</h2>
+
+<h3>1D Case</h3>
+<div class="formula">
+$$\Pr(x) = \Pr(z) \cdot \left|\frac{dz}{dx}\right| = \Pr(f^{-1}(x)) \cdot \left|\frac{df^{-1}}{dx}\right|$$
+</div>
+
+<h3>D-Dimensional Case</h3>
+<div class="formula">
+$$\Pr(\mathbf{x}) = \Pr(\mathbf{z}) \cdot \left|\det \frac{\partial \mathbf{z}}{\partial \mathbf{x}}\right| = \Pr(f^{-1}(\mathbf{x})) \cdot \left|\det \mathbf{J}_{f^{-1}}(\mathbf{x})\right|$$
+</div>
+<p>The absolute determinant of the Jacobian measures the local volume change.</p>
+
+<h2 id="composition">Composition of Layers</h2>
+<p>A flow is a composition of $K$ invertible (bijective) layers:</p>
+<div class="formula">
+$$\mathbf{x} = f_K \circ f_{K-1} \circ \cdots \circ f_1(\mathbf{z})$$
+</div>
+<p>By the chain rule, the Jacobian factorizes:</p>
+<div class="formula">
+$$\log \Pr(\mathbf{x}) = \log \Pr(\mathbf{z}) + \sum_{k=1}^{K} \log \left|\det \mathbf{J}_{f_k^{-1}}\right|$$
+</div>
+
+<h2 id="training">Training</h2>
+<p>Maximize the exact log-likelihood over the training data:</p>
+<div class="formula">
+$$\mathcal{L} = \sum_{i} \log \Pr(\mathbf{x}_i) = \sum_{i} \left[\log \Pr(\mathbf{z}_i) + \sum_{k} \log \left|\det \mathbf{J}_k\right|\right]$$
+</div>
+
+<h2 id="layer-design">Layer Design Desiderata</h2>
+<ol>
+  <li><strong>Expressive</strong> enough for complex densities</li>
+  <li><strong>Bijective</strong> (one-to-one mapping)</li>
+  <li><strong>Fast inverse</strong> computation</li>
+  <li><strong>Fast Jacobian determinant</strong> computation</li>
+</ol>
+
+<h2 id="layer-types">Layer Types</h2>
+
+<h3>Linear Flows</h3>
+<p>$f(\mathbf{z}) = \boldsymbol{\Omega}\mathbf{z} + \mathbf{b}$ with invertible $\boldsymbol{\Omega}$. Naively $O(D^3)$ for determinant; LU factorization brings it to $O(D^2)$.</p>
+
+<h3>Elementwise Flows</h3>
+<p>Per-dimension invertible transform (no mixing between dimensions). Jacobian is <strong>diagonal</strong> &rArr; log-det is just a sum. Need permutations or coupling layers to mix dimensions.</p>
+
+<h3>Coupling Flows (RealNVP)</h3>
+<p>Split input into two groups $(\mathbf{z}_A, \mathbf{z}_B)$:</p>
+<ul>
+  <li>$\mathbf{x}_A = \mathbf{z}_A$ (identity)</li>
+  <li>$\mathbf{x}_B = g(\mathbf{z}_B; \theta(\mathbf{z}_A))$ (transformed conditioned on $\mathbf{z}_A$)</li>
+</ul>
+<p>The Jacobian is <strong>block-triangular</strong> &rArr; determinant is the product of diagonal blocks (cheap!). Affine coupling: $g(z) = s \cdot z + t$ where $s, t$ are outputs of a neural network applied to $\mathbf{z}_A$.</p>
+
+<p>Stack multiple coupling layers with <strong>alternating splits</strong> + permutations/1&times;1 convolutions between them to ensure all dimensions interact.</p>
+
+<h3>Autoregressive Flows (MAF/IAF)</h3>
+<p>Dimension $d$ is conditioned on earlier dimensions $1, \ldots, d-1$. The Jacobian is <strong>triangular</strong> &rArr; determinant is the product of diagonal entries. Masked design enables parallel computation in one direction.</p>
+
+<h2 id="comparison">Comparison: Flows vs VAEs</h2>
+<table class="comparison">
+  <tr><th></th><th>Normalizing Flows</th><th>VAEs</th></tr>
+  <tr><td>Likelihood</td><td>Exact</td><td>Lower bound (ELBO)</td></tr>
+  <tr><td>Sampling</td><td>Exact</td><td>Exact (from decoder)</td></tr>
+  <tr><td>Architecture</td><td>Must be invertible</td><td>Arbitrary encoder/decoder</td></tr>
+  <tr><td>Latent dim</td><td>Must equal data dim</td><td>Can be lower-dimensional</td></tr>
+  <tr><td>Training</td><td>MLE (exact)</td><td>ELBO maximization</td></tr>
+</table>
+</section>
+
+<section id="page-diffusion" class="page-section" style="display:none">
+<h1>Diffusion Models</h1>
+<p><strong>Lectures:</strong> L19&ndash;L21 &bull; <strong>Prince:</strong> Chapter 18</p>
+
+<h2 id="overview">Overview</h2>
+<p>Diffusion models (DDPM) are currently the state-of-the-art for image generation. The core idea:</p>
+<ol>
+  <li><strong>Forward process:</strong> Gradually add Gaussian noise over $T$ steps until data becomes pure noise</li>
+  <li><strong>Reverse process:</strong> Learn a neural network to denoise one step at a time</li>
+  <li><strong>Sampling:</strong> Start from pure noise and iteratively denoise to generate data</li>
+</ol>
+
+<h2 id="forward">Forward (Diffusion) Process</h2>
+
+<p>At each step $t$, add a small amount of Gaussian noise:</p>
+<div class="formula">
+$$q(\mathbf{z}_t \mid \mathbf{z}_{t-1}) = \mathcal{N}(\mathbf{z}_t; \sqrt{1-\beta_t}\,\mathbf{z}_{t-1}, \beta_t \mathbf{I})$$
+</div>
+<p>where $\{\beta_t\}_{t=1}^T$ is the <strong>noise schedule</strong> (variance schedule), typically $\beta_1 = 10^{-4}$ to $\beta_T = 0.02$.</p>
+
+<h3>Key Shortcut: Jump to Any Step</h3>
+<p>Define $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{s=1}^{t} \alpha_s$. Then:</p>
+<div class="formula">
+$$q(\mathbf{z}_t \mid \mathbf{x}) = \mathcal{N}(\mathbf{z}_t; \sqrt{\bar{\alpha}_t}\,\mathbf{x}, (1-\bar{\alpha}_t)\mathbf{I})$$
+</div>
+
+<div class="key-concept">
+  <strong>Interpretation:</strong> $\mathbf{z}_t$ is a mixture of the original data $\mathbf{x}$ and noise $\boldsymbol{\epsilon}$:
+  $$\mathbf{z}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{x} + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$$
+</div>
+
+<h2 id="reverse">Reverse (Denoising) Process</h2>
+
+<p>The reverse process is also Gaussian (for small $\beta_t$):</p>
+<div class="formula">
+$$\Pr(\mathbf{z}_{t-1} \mid \mathbf{z}_t, \boldsymbol{\phi}) = \mathcal{N}(\mathbf{z}_{t-1}; \boldsymbol{\mu}_\phi(\mathbf{z}_t, t), \sigma_t^2 \mathbf{I})$$
+</div>
+<p>A neural network (typically U-Net) predicts $\boldsymbol{\mu}_\phi$ (or equivalently, the noise $\boldsymbol{\epsilon}$).</p>
+
+<h2 id="training">Training: Simplified Loss</h2>
+
+<h3>From ELBO to Simple Loss</h3>
+<p>The ELBO for diffusion models decomposes into a sum of KL divergence terms between pairs of consecutive steps $(t-1, t)$. After simplification, the training loss reduces to:</p>
+
+<div class="formula">
+$$\mathcal{L}_\text{simple} = \mathbb{E}_{t, \mathbf{x}, \boldsymbol{\epsilon}}\left[\|\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\phi(\mathbf{z}_t, t)\|^2\right]$$
+</div>
+
+<div class="admonition tip">
+  <div class="admonition-title">Training Algorithm</div>
+  <ol>
+    <li>Sample a data point $\mathbf{x}$ from the training set</li>
+    <li>Sample a random timestep $t \sim \text{Uniform}\{1, \ldots, T\}$</li>
+    <li>Sample noise $\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$</li>
+    <li>Compute noisy version: $\mathbf{z}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{x} + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}$</li>
+    <li>Train the network to predict $\boldsymbol{\epsilon}$ from $(\mathbf{z}_t, t)$: minimize $\|\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\phi(\mathbf{z}_t, t)\|^2$</li>
+  </ol>
+</div>
+
+<h2 id="elbo-derivation">ELBO Derivation (L21)</h2>
+
+<h3>Graphical Model</h3>
+<p>Forward model (reverse diffusion): $\Pr(\mathbf{x}, \mathbf{z}_{1:T}) = \Pr(\mathbf{z}_T) \prod_{t=1}^{T} \Pr(\mathbf{z}_{t-1} \mid \mathbf{z}_t)$</p>
+<p>Variational approximation (diffusion process): $q(\mathbf{z}_{1:T} \mid \mathbf{x}) = \prod_{t=1}^{T} q(\mathbf{z}_t \mid \mathbf{z}_{t-1})$</p>
+
+<h3>ELBO Decomposition</h3>
+<p>Apply the ELBO trick and use the causal structure of the graphical model to get terms that only involve consecutive timesteps $(t-1, t)$:</p>
+<div class="formula">
+$$\text{ELBO} = \mathbb{E}_q\!\left[\log \Pr(\mathbf{x} \mid \mathbf{z}_1)\right] - \sum_{t=2}^{T} \mathbb{E}_q\!\left[D_\text{KL}(q(\mathbf{z}_{t-1} \mid \mathbf{z}_t, \mathbf{x}) \| \Pr(\mathbf{z}_{t-1} \mid \mathbf{z}_t))\right] - D_\text{KL}(q(\mathbf{z}_T \mid \mathbf{x}) \| \Pr(\mathbf{z}_T))$$
+</div>
+
+<p>Each KL term is between two Gaussians &rArr; closed-form. The KL between two Gaussians $\mathcal{N}(\boldsymbol{\mu}_1, \boldsymbol{\Sigma}_1)$ and $\mathcal{N}(\boldsymbol{\mu}_2, \boldsymbol{\Sigma}_2)$ has an analytic formula.</p>
+
+<h2 id="sampling">Sampling</h2>
+<ol>
+  <li>Start: $\mathbf{z}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$</li>
+  <li>For $t = T, T-1, \ldots, 1$: compute $\mathbf{z}_{t-1}$ using the learned reverse process</li>
+  <li>Output: $\mathbf{z}_0 \approx \mathbf{x}$</li>
+</ol>
+
+<h2 id="conditioning">Conditioning and Guidance</h2>
+
+<h3>Classifier Guidance</h3>
+<p>Use a separate classifier $p(y \mid \mathbf{z}_t)$ to guide the diffusion process toward a desired class. Add the classifier gradient to the denoising step.</p>
+
+<h3>Classifier-Free Guidance</h3>
+<p>Train a single model that can be both conditional and unconditional. At sampling time, interpolate between the two:</p>
+<div class="formula">
+$$\tilde{\boldsymbol{\epsilon}}_\phi = (1 + w) \boldsymbol{\epsilon}_\phi(\mathbf{z}_t, t, y) - w \cdot \boldsymbol{\epsilon}_\phi(\mathbf{z}_t, t, \varnothing)$$
+</div>
+<p>where $w > 0$ controls guidance strength. Higher $w$ &rArr; more adherence to the conditioning (e.g., text prompt) but less diversity.</p>
+
+<h2 id="ddim">DDIM: Faster Sampling</h2>
+<p>DDPM requires $T$ steps (often 1000). DDIM (Denoising Diffusion Implicit Models) provides a deterministic, non-Markovian sampling process that can skip steps, allowing generation in far fewer steps (e.g., 50).</p>
+
+<h2 id="applications">Applications</h2>
+<ul>
+  <li><strong>Text-to-image:</strong> DALL-E 2, Imagen, Stable Diffusion</li>
+  <li><strong>Image editing:</strong> inpainting, super-resolution</li>
+  <li><strong>Scientific:</strong> molecular generation, protein structure</li>
+</ul>
+
+<h2 id="comparison">Generative Models Comparison</h2>
+<table class="comparison">
+  <tr><th></th><th>VAEs</th><th>Flows</th><th>Diffusion</th><th>GANs</th></tr>
+  <tr><td>Likelihood</td><td>ELBO (lower bound)</td><td>Exact</td><td>ELBO (but tight)</td><td>None</td></tr>
+  <tr><td>Sample quality</td><td>Blurry</td><td>Good</td><td>State-of-the-art</td><td>High (mode collapse risk)</td></tr>
+  <tr><td>Sampling speed</td><td>Fast (1 pass)</td><td>Fast (1 pass)</td><td>Slow ($T$ steps)</td><td>Fast (1 pass)</td></tr>
+  <tr><td>Training stability</td><td>Stable</td><td>Stable</td><td>Stable</td><td>Notoriously unstable</td></tr>
+  <tr><td>Architecture</td><td>Arbitrary</td><td>Must be invertible</td><td>U-Net typical</td><td>Generator + discriminator</td></tr>
+</table>
+</section>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait for KaTeX to load, then render the initially visible section
+  function tryRenderMath(el) {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(el, {
+        delimiters: [
+          {left: '$$', right: '$$', display: true},
+          {left: '$', right: '$', display: false}
+        ]
+      });
+    }
+  }
+
+  // Render math on initial page after KaTeX loads
+  var katexCheckInterval = setInterval(function() {
+    if (typeof renderMathInElement === 'function') {
+      clearInterval(katexCheckInterval);
+      var visible = document.querySelector('.page-section[style*="display:block"], .page-section[style*="display: block"]');
+      if (visible) tryRenderMath(visible);
+    }
+  }, 100);
+
+  // Track which sections have had math rendered
+  var mathRendered = {'index': false};
+
+  // Page navigation
+  var allPageLinks = document.querySelectorAll('a[data-page]');
+  var allSections = document.querySelectorAll('.page-section');
+
+  allPageLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      var targetPage = this.getAttribute('data-page');
+
+      // Hide all sections
+      allSections.forEach(function(sec) {
+        sec.style.display = 'none';
+      });
+
+      // Show target section
+      var target = document.getElementById('page-' + targetPage);
+      if (target) {
+        target.style.display = 'block';
+
+        // Render math if not already done
+        if (!mathRendered[targetPage]) {
+          tryRenderMath(target);
+          mathRendered[targetPage] = true;
+        }
+      }
+
+      // Update active link
+      allPageLinks.forEach(function(l) { l.classList.remove('active'); });
+      this.classList.add('active');
+
+      // Expand parent category if it's a sub-item
+      var parentLi = this.closest('ul').closest('li');
+      if (parentLi) {
+        parentLi.classList.add('expanded');
+      }
+
+      // Scroll to top
+      window.scrollTo(0, 0);
+    });
+  });
+
+  // Category expand/collapse
+  var categoryToggles = document.querySelectorAll('.category-toggle');
+  categoryToggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function(e) {
+      e.preventDefault();
+      var parentLi = this.parentElement;
+      parentLi.classList.toggle('expanded');
+    });
+  });
+
+  // Search filter
+  var searchInput = document.getElementById('sidebar-search');
+  searchInput.addEventListener('input', function() {
+    var query = this.value.toLowerCase().trim();
+    var items = document.querySelectorAll('.sidebar nav > ul > li');
+
+    if (query === '') {
+      // Show all, collapse all categories
+      items.forEach(function(item) {
+        item.style.display = '';
+        var subLinks = item.querySelectorAll('ul > li');
+        subLinks.forEach(function(sl) { sl.style.display = ''; });
+      });
+      return;
+    }
+
+    items.forEach(function(item) {
+      var topLink = item.querySelector(':scope > a');
+      var topText = topLink ? topLink.textContent.toLowerCase() : '';
+      var subLinks = item.querySelectorAll('ul > li');
+      var anySubMatch = false;
+
+      subLinks.forEach(function(sl) {
+        var slText = sl.textContent.toLowerCase();
+        if (slText.includes(query)) {
+          sl.style.display = '';
+          anySubMatch = true;
+        } else {
+          sl.style.display = 'none';
+        }
+      });
+
+      if (topText.includes(query) || anySubMatch) {
+        item.style.display = '';
+        if (anySubMatch) item.classList.add('expanded');
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  });
+
+  // Also handle clicks on topic-card links inside the index page
+  document.addEventListener('click', function(e) {
+    var link = e.target.closest('a');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (!href || !href.endsWith('.html')) return;
+
+    // Map filename to page id
+    var match = href.match(/([^/]+)\.html$/);
+    if (!match) return;
+    var pageName = match[1];
+    var pageLink = document.querySelector('a[data-page="' + pageName + '"]');
+    if (pageLink) {
+      e.preventDefault();
+      pageLink.click();
+    }
+  });
+});
+</script>
+</body>
+</html>

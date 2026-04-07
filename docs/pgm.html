@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probabilistic Graphical Models - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li class="expanded"><a href="#">Generative Models</a><ul><li><a href="pgm.html" class="active">PGMs (L16)</a></li><li><a href="vae.html">VAEs (L17)</a></li><li><a href="flows.html">Flows (L18)</a></li><li><a href="diffusion.html">Diffusion (L19&ndash;L21)</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Generative Models &raquo; PGMs</div>
+
+<h1>Probabilistic Graphical Models</h1>
+<p><strong>Lecture:</strong> L16 (+ start of L17) &bull; <strong>Source:</strong> Lecture notes only (not in Prince)</p>
+
+<h2 id="core-idea">Core Idea</h2>
+<div class="key-concept">
+  <strong>A PGM is a compact visual representation of a factorized joint distribution.</strong> It communicates causal/dependency assumptions and keeps you honest about what you're assuming about the world.
+</div>
+
+<h2 id="directed-pgm">Directed PGMs (Bayesian Networks)</h2>
+
+<p>A directed PGM is a picture of a product of conditional probabilities:</p>
+<div class="formula">
+$$\Pr(x_1, x_2, \ldots, x_K) = \prod_{k=1}^{K} \Pr\!\left(x_k \mid \text{parents}(X_k)\right)$$
+</div>
+
+<p><strong>Rules:</strong></p>
+<ul>
+  <li>One factor per node: "node given its parents"</li>
+  <li>Arrows go from cause &rarr; effect</li>
+  <li>Arrows encode which variables each conditional is allowed to depend on</li>
+</ul>
+
+<h3>Example: Wet Grass</h3>
+<p>$R$ = rain, $S$ = sprinkler, $W$ = wet grass</p>
+<div class="formula">
+$$\Pr(R, S, W) = \Pr(R) \cdot \Pr(S) \cdot \Pr(W \mid R, S)$$
+</div>
+<p>Given $W=1$ (grass is wet), we can compute the posterior $\Pr(R, S \mid W=1)$ using Bayes' rule.</p>
+
+<h2 id="notation">Visual Notation</h2>
+<table>
+  <tr><th>Symbol</th><th>Meaning</th></tr>
+  <tr><td>White (open) circle</td><td>Latent variable (unobserved)</td></tr>
+  <tr><td>Shaded circle</td><td>Observed variable (data)</td></tr>
+  <tr><td>Small filled dot / no circle</td><td>Deterministic / fixed parameter</td></tr>
+  <tr><td>Box with $n = 1{:}N$</td><td>Plate: repeated structure (N copies)</td></tr>
+</table>
+
+<h2 id="workflow">Two-Phase Workflow</h2>
+<ol>
+  <li><strong>Describe the generative model:</strong> What causes what? What are the latent variables and parameters? Write down the forward probabilistic story.</li>
+  <li><strong>Decide how to compute:</strong> Exact conjugacy (tiny models), optimization (MLE/MAP), variational inference, MCMC, etc. These methods take the joint (or log joint) as input.</li>
+</ol>
+
+<div class="admonition warning">
+  <div class="admonition-title">Common Mistake</div>
+  <p>Don't draw arrows from data to parameters! "$\mu$ computed from data" is an <em>algorithm</em>. The PGM must encode the <strong>generative story</strong>: parameters &rarr; data. Inference goes the other direction computationally, but the graph doesn't.</p>
+</div>
+
+<h2 id="probability-refresher">Probability Refresher</h2>
+
+<h3>Key Rules</h3>
+<div class="formula">
+$$\text{Marginalisation: } \Pr(x) = \int \Pr(x, y) \, dy$$
+</div>
+<div class="formula">
+$$\text{Conditional: } \Pr(a \mid b) = \frac{\Pr(a, b)}{\Pr(b)}$$
+</div>
+<div class="formula">
+$$\text{Bayes: } \Pr(\omega \mid \mathcal{D}) = \frac{\Pr(\mathcal{D} \mid \omega) \, \Pr(\omega)}{\Pr(\mathcal{D})}$$
+</div>
+
+<h3>Bayes Rule: The Main Story of ML</h3>
+<table>
+  <tr><th>Term</th><th>Role</th></tr>
+  <tr><td>$\Pr(\omega)$</td><td>Prior: what you know about parameters before seeing data</td></tr>
+  <tr><td>$\Pr(\mathcal{D} \mid \omega)$</td><td>Likelihood: how well parameters explain the data</td></tr>
+  <tr><td>$\Pr(\omega \mid \mathcal{D})$</td><td>Posterior: updated belief after seeing data</td></tr>
+  <tr><td>$\Pr(\mathcal{D})$</td><td>Evidence: normalizing constant</td></tr>
+</table>
+
+<h2 id="mle-map">MLE vs MAP</h2>
+<div class="formula">
+$$\hat{\omega}_\text{MLE} = \arg\max_\omega \Pr(\mathcal{D} \mid \omega)$$
+</div>
+<div class="formula">
+$$\hat{\omega}_\text{MAP} = \arg\max_\omega \Pr(\mathcal{D} \mid \omega) \, \Pr(\omega)$$
+</div>
+<p>MAP = MLE + prior. Adding a Gaussian prior &harr; L2 regularization. Adding a Laplace prior &harr; L1 regularization.</p>
+
+<h2 id="coin-example">Example: Coin Flipping</h2>
+<p>Parameter $\omega$ (bias), observations $x_1, \ldots, x_N$ where $x_i \in \{0, 1\}$. Plate notation with conditionally independent flips:</p>
+<div class="formula">
+$$\Pr(\omega, x_{1:N}) = \Pr(\omega) \prod_{n=1}^{N} \Pr(x_n \mid \omega)$$
+</div>
+<p>Posterior via Bayes: $\Pr(\omega \mid x_{1:N}) \propto \Pr(\omega) \prod_{n=1}^N \Pr(x_n \mid \omega)$</p>
+
+<h2 id="directed-vs-undirected">Directed vs Undirected PGMs</h2>
+<table>
+  <tr><th></th><th>Directed (Bayesian Networks)</th><th>Undirected (Markov Random Fields)</th></tr>
+  <tr><td>Edges</td><td>Arrows (causal story)</td><td>No arrows (symmetric dependence)</td></tr>
+  <tr><td>Factorization</td><td>Product of conditionals</td><td>Product of potential functions / partition function</td></tr>
+  <tr><td>Focus of this course</td><td>Yes</td><td>Briefly mentioned</td></tr>
+</table>
+
+<div class="admonition tip">
+  <div class="admonition-title">Connection to Rest of Course</div>
+  <p>PGMs provide the foundation for understanding VAEs, diffusion models, and other latent variable models. The generative story (PGM) defines the joint distribution, and inference methods (variational inference, ELBO) are used when exact posterior computation is intractable.</p>
+</div>
+
+<div class="nav-footer">
+  <a href="rl-algorithms.html">&larr; RL Algorithms</a>
+  <a href="vae.html">VAEs &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

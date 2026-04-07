@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RL Foundations - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs</a></li></ul></li>
+    <li class="expanded"><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html" class="active">RL Foundations (L12&ndash;L13)</a></li><li><a href="rl-algorithms.html">RL Algorithms (L14&ndash;L15)</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Reinforcement Learning &raquo; RL Foundations</div>
+
+<h1>Reinforcement Learning Foundations</h1>
+<p><strong>Lectures:</strong> L12&ndash;L13 &bull; <strong>Prince:</strong> Chapter 19</p>
+
+<h2 id="overview">Overview</h2>
+<p>RL is a <strong>sequential decision-making</strong> framework. An agent interacts with an environment to maximize cumulative reward.</p>
+
+<p>At each time step $t$:</p>
+<ol>
+  <li>Agent observes state $s_t$</li>
+  <li>Agent takes action $a_t$</li>
+  <li>Environment returns reward $r_{t+1}$ and next state $s_{t+1}$</li>
+</ol>
+
+<h2 id="mdp">Markov Decision Processes</h2>
+
+<p>An MDP is defined by the tuple $(S, A, \Pr(s_{t+1}, r_{t+1} \mid s_t, a_t), \gamma)$:</p>
+<table>
+  <tr><th>Component</th><th>Meaning</th></tr>
+  <tr><td>$S$</td><td>State space</td></tr>
+  <tr><td>$A$</td><td>Action space</td></tr>
+  <tr><td>$\Pr(s', r \mid s, a)$</td><td>Transition dynamics (may be unknown)</td></tr>
+  <tr><td>$\gamma \in (0, 1]$</td><td>Discount factor (larger = more far-sighted)</td></tr>
+</table>
+
+<div class="key-concept">
+  <strong>Markov Property:</strong> The future depends only on the current state, not on the full history: $\Pr(s_{t+1} \mid s_t, a_t) = \Pr(s_{t+1} \mid s_1, a_1, \ldots, s_t, a_t)$.
+</div>
+
+<h3>Building Blocks: MP &rarr; MRP &rarr; MDP</h3>
+<ul>
+  <li><strong>Markov Process (MP):</strong> states + transitions only (no actions, no rewards)</li>
+  <li><strong>Markov Reward Process (MRP):</strong> add reward function $r[s]$</li>
+  <li><strong>MDP:</strong> add actions &mdash; agent can influence transitions</li>
+</ul>
+
+<h2 id="return">Return and Discount</h2>
+
+<p>The <strong>return</strong> from time $t$ is the discounted sum of future rewards:</p>
+<div class="formula">
+$$G_t = \sum_{k=0}^{\infty} \gamma^k \, r_{t+k+1}$$
+</div>
+<p>$\gamma < 1$ ensures the sum converges and makes the agent prefer sooner rewards.</p>
+
+<h2 id="policy">Policy</h2>
+
+<p>A policy $\pi$ dictates the agent's behavior:</p>
+<ul>
+  <li><strong>Deterministic:</strong> $a = \pi(s)$</li>
+  <li><strong>Stochastic:</strong> $\pi[a \mid s] = \Pr(a \mid s)$</li>
+</ul>
+<p>Goal: find the <strong>optimal policy</strong> $\pi^*$ that maximizes expected return.</p>
+
+<h2 id="value-functions">Value Functions</h2>
+
+<h3>State-Value Function</h3>
+<div class="formula">
+$$v[s \mid \pi] = \mathbb{E}_\pi[G_t \mid s_t = s]$$
+</div>
+<p>Expected return when starting in state $s$ and following policy $\pi$.</p>
+
+<h3>Action-Value Function</h3>
+<div class="formula">
+$$q[s, a \mid \pi] = \mathbb{E}_\pi[G_t \mid s_t = s, a_t = a]$$
+</div>
+<p>Expected return when starting in $s$, taking action $a$, then following $\pi$.</p>
+
+<h3>Relationships Between $v$ and $q$</h3>
+<div class="formula">
+$$v[s] = \sum_a \pi[a \mid s] \cdot q[s, a] \quad \text{(v from q: average over policy)}$$
+</div>
+<div class="formula">
+$$q[s, a] = r[s, a] + \gamma \sum_{s'} \Pr(s' \mid s, a) \, v[s'] \quad \text{(q from v: one-step lookahead)}$$
+</div>
+
+<h2 id="bellman">Bellman Equations</h2>
+
+<p>Self-consistency constraints that any value function must satisfy:</p>
+
+<h3>Bellman Equation for $q$</h3>
+<div class="formula">
+$$q[s_t, a_t] = r[s_t, a_t] + \gamma \, \mathbb{E}_{s_{t+1}} \left[ \mathbb{E}_{a_{t+1} \sim \pi} \left[ q[s_{t+1}, a_{t+1}] \right] \right]$$
+</div>
+
+<p>In words: the value of taking action $a$ in state $s$ equals (1) the immediate reward, plus (2) the discounted expected value of the next state-action pair.</p>
+
+<h3>Bellman Optimality Equation</h3>
+<p>For the optimal policy, replace "expected action under $\pi$" with "best action":</p>
+<div class="formula">
+$$q^*[s, a] = r[s, a] + \gamma \sum_{s'} \Pr(s' \mid s, a) \max_{a'} q^*[s', a']$$
+</div>
+
+<div class="admonition note">
+  <div class="admonition-title">Key Insight</div>
+  <p>The Bellman equations create a "ripple effect": changing $v[s]$ affects values of predecessor states. Many RL algorithms are methods to solve or approximate these equations.</p>
+</div>
+
+<h2 id="exploration">Exploration vs Exploitation</h2>
+<ul>
+  <li><strong>Exploitation:</strong> choose actions that currently look best</li>
+  <li><strong>Exploration:</strong> try actions that might reveal higher long-term return</li>
+  <li>You cannot learn $q(s,a)$ for actions you never take!</li>
+</ul>
+
+<h3>Exploration Strategies</h3>
+<table>
+  <tr><th>Strategy</th><th>Description</th></tr>
+  <tr><td>$\epsilon$-greedy</td><td>With probability $\epsilon$ take random action, else greedy</td></tr>
+  <tr><td>Softmax/Boltzmann</td><td>Sample proportional to $\exp(q/\tau)$</td></tr>
+  <tr><td>Optimistic initialization</td><td>Start $q$ high to encourage trying all actions</td></tr>
+</table>
+
+<h2 id="model-based-vs-free">Model-Based vs Model-Free</h2>
+<table class="comparison">
+  <tr><th>Approach</th><th>Knows</th><th>Method</th></tr>
+  <tr><td><strong>Model-based</strong></td><td>$\Pr(s'|s,a)$ and $r[s,a]$</td><td>Dynamic programming (planning)</td></tr>
+  <tr><td><strong>Model-free</strong></td><td>Only samples $(s, a, r, s')$</td><td>Monte Carlo, TD learning, Q-learning</td></tr>
+</table>
+
+<div class="nav-footer">
+  <a href="llms.html">&larr; LLMs &amp; Decoding</a>
+  <a href="rl-algorithms.html">RL Algorithms &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

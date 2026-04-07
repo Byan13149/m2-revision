@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Normalizing Flows - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li class="expanded"><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html" class="active">Flows (L18)</a></li><li><a href="diffusion.html">Diffusion (L19&ndash;L21)</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Generative Models &raquo; Normalizing Flows</div>
+
+<h1>Normalizing Flows</h1>
+<p><strong>Lecture:</strong> L18 &bull; <strong>Prince:</strong> Chapter 16</p>
+
+<h2 id="motivation">Motivation</h2>
+<p>Unlike VAEs, normalizing flows give us <strong>exact likelihoods</strong> and <strong>exact sampling</strong>. No ELBO approximation needed.</p>
+<ul>
+  <li>Sample $\mathbf{x}$ from a complex distribution</li>
+  <li>Evaluate $\log \Pr(\mathbf{x})$ exactly</li>
+  <li>Key requirement: every layer must be <strong>invertible</strong></li>
+</ul>
+
+<h2 id="1d-intuition">1D Flow Intuition</h2>
+
+<h3>Sampling Direction ($z \to x$)</h3>
+<p>Start from a simple base density $\Pr(\mathbf{z})$ (e.g., Gaussian). Map through an invertible function. Stretching lowers density; compression raises density.</p>
+
+<h3>Likelihood Direction ($x \to z$)</h3>
+<p>Apply the inverse map. A derivative (Jacobian) term corrects for local stretching/compression.</p>
+
+<h2 id="change-of-variables">Change of Variables Formula</h2>
+
+<h3>1D Case</h3>
+<div class="formula">
+$$\Pr(x) = \Pr(z) \cdot \left|\frac{dz}{dx}\right| = \Pr(f^{-1}(x)) \cdot \left|\frac{df^{-1}}{dx}\right|$$
+</div>
+
+<h3>D-Dimensional Case</h3>
+<div class="formula">
+$$\Pr(\mathbf{x}) = \Pr(\mathbf{z}) \cdot \left|\det \frac{\partial \mathbf{z}}{\partial \mathbf{x}}\right| = \Pr(f^{-1}(\mathbf{x})) \cdot \left|\det \mathbf{J}_{f^{-1}}(\mathbf{x})\right|$$
+</div>
+<p>The absolute determinant of the Jacobian measures the local volume change.</p>
+
+<h2 id="composition">Composition of Layers</h2>
+<p>A flow is a composition of $K$ invertible (bijective) layers:</p>
+<div class="formula">
+$$\mathbf{x} = f_K \circ f_{K-1} \circ \cdots \circ f_1(\mathbf{z})$$
+</div>
+<p>By the chain rule, the Jacobian factorizes:</p>
+<div class="formula">
+$$\log \Pr(\mathbf{x}) = \log \Pr(\mathbf{z}) + \sum_{k=1}^{K} \log \left|\det \mathbf{J}_{f_k^{-1}}\right|$$
+</div>
+
+<h2 id="training">Training</h2>
+<p>Maximize the exact log-likelihood over the training data:</p>
+<div class="formula">
+$$\mathcal{L} = \sum_{i} \log \Pr(\mathbf{x}_i) = \sum_{i} \left[\log \Pr(\mathbf{z}_i) + \sum_{k} \log \left|\det \mathbf{J}_k\right|\right]$$
+</div>
+
+<h2 id="layer-design">Layer Design Desiderata</h2>
+<ol>
+  <li><strong>Expressive</strong> enough for complex densities</li>
+  <li><strong>Bijective</strong> (one-to-one mapping)</li>
+  <li><strong>Fast inverse</strong> computation</li>
+  <li><strong>Fast Jacobian determinant</strong> computation</li>
+</ol>
+
+<h2 id="layer-types">Layer Types</h2>
+
+<h3>Linear Flows</h3>
+<p>$f(\mathbf{z}) = \boldsymbol{\Omega}\mathbf{z} + \mathbf{b}$ with invertible $\boldsymbol{\Omega}$. Naively $O(D^3)$ for determinant; LU factorization brings it to $O(D^2)$.</p>
+
+<h3>Elementwise Flows</h3>
+<p>Per-dimension invertible transform (no mixing between dimensions). Jacobian is <strong>diagonal</strong> &rArr; log-det is just a sum. Need permutations or coupling layers to mix dimensions.</p>
+
+<h3>Coupling Flows (RealNVP)</h3>
+<p>Split input into two groups $(\mathbf{z}_A, \mathbf{z}_B)$:</p>
+<ul>
+  <li>$\mathbf{x}_A = \mathbf{z}_A$ (identity)</li>
+  <li>$\mathbf{x}_B = g(\mathbf{z}_B; \theta(\mathbf{z}_A))$ (transformed conditioned on $\mathbf{z}_A$)</li>
+</ul>
+<p>The Jacobian is <strong>block-triangular</strong> &rArr; determinant is the product of diagonal blocks (cheap!). Affine coupling: $g(z) = s \cdot z + t$ where $s, t$ are outputs of a neural network applied to $\mathbf{z}_A$.</p>
+
+<p>Stack multiple coupling layers with <strong>alternating splits</strong> + permutations/1&times;1 convolutions between them to ensure all dimensions interact.</p>
+
+<h3>Autoregressive Flows (MAF/IAF)</h3>
+<p>Dimension $d$ is conditioned on earlier dimensions $1, \ldots, d-1$. The Jacobian is <strong>triangular</strong> &rArr; determinant is the product of diagonal entries. Masked design enables parallel computation in one direction.</p>
+
+<h2 id="comparison">Comparison: Flows vs VAEs</h2>
+<table class="comparison">
+  <tr><th></th><th>Normalizing Flows</th><th>VAEs</th></tr>
+  <tr><td>Likelihood</td><td>Exact</td><td>Lower bound (ELBO)</td></tr>
+  <tr><td>Sampling</td><td>Exact</td><td>Exact (from decoder)</td></tr>
+  <tr><td>Architecture</td><td>Must be invertible</td><td>Arbitrary encoder/decoder</td></tr>
+  <tr><td>Latent dim</td><td>Must equal data dim</td><td>Can be lower-dimensional</td></tr>
+  <tr><td>Training</td><td>MLE (exact)</td><td>ELBO maximization</td></tr>
+</table>
+
+<div class="nav-footer">
+  <a href="vae.html">&larr; VAEs</a>
+  <a href="diffusion.html">Diffusion Models &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

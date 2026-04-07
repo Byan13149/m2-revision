@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Residual Networks - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li class="expanded"><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html" class="active">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs &amp; Decoding</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Convolutional Networks &raquo; Residual Networks</div>
+
+<h1>Residual Networks &amp; Normalization</h1>
+<p><strong>Lectures:</strong> L04&ndash;L05, L08 &bull; <strong>Prince:</strong> Chapter 11</p>
+
+<h2 id="problem">The Degradation Problem</h2>
+<p>Adding more layers to a plain (non-residual) network helps initially, but beyond a certain depth performance <strong>degrades</strong> &mdash; even on the <em>training</em> set. This is not overfitting; it's an optimization problem.</p>
+
+<div class="admonition note">
+  <div class="admonition-title">Shattered Gradients</div>
+  <p>In very deep networks, gradients at initialization change unpredictably across layers. With finite learning rates, these "shattered gradients" cause unstable training. The gradient signal becomes unreliable.</p>
+</div>
+
+<h2 id="residual-connection">Residual (Skip) Connections</h2>
+
+<p>A residual block learns a <strong>residual function</strong> $g(\mathbf{h})$ and adds it to the input:</p>
+<div class="formula">
+$$\mathbf{h}_{k+1} = \mathbf{h}_k + g[\mathbf{h}_k]$$
+</div>
+
+<p>Each block only needs to predict the <strong>change</strong> from the previous layer, rather than the entire representation.</p>
+
+<h3>Why It Helps: Gradient Flow</h3>
+<ul>
+  <li><strong>Plain network gradient:</strong> $\frac{\partial \mathbf{h}_K}{\partial \mathbf{h}_k} = \prod_{l=k}^{K-1} \frac{\partial \mathbf{h}_{l+1}}{\partial \mathbf{h}_l}$ &mdash; products can vanish or explode</li>
+  <li><strong>Residual network gradient:</strong> $\frac{\partial \mathbf{h}_K}{\partial \mathbf{h}_k} = \mathbf{I} + \ldots$ &mdash; always has an identity component, ensuring gradients can flow directly</li>
+</ul>
+
+<div class="key-concept">
+  <strong>Key insight:</strong> Residual connections roughly <em>double</em> the number of layers you can train before performance degrades. Combined with normalization, networks can go to hundreds of layers.
+</div>
+
+<h2 id="batch-norm">Batch Normalization</h2>
+
+<p>Normalizes activations within each mini-batch:</p>
+<div class="formula">
+$$\hat{h}_j = \frac{h_j - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}$$
+$$\tilde{h}_j = \gamma \hat{h}_j + \beta$$
+</div>
+
+<ul>
+  <li>$\mu_B, \sigma_B^2$: mean and variance computed over the mini-batch</li>
+  <li>$\gamma, \beta$: learnable scale and shift (initialized to 1 and 0)</li>
+  <li>In CNNs: statistics are computed over (batch) &times; (spatial dimensions) per channel</li>
+  <li>At test time: use running averages of $\mu$ and $\sigma^2$ collected during training</li>
+</ul>
+
+<p>Effects: stabilizes training, smooths the loss surface, enables larger learning rates, acts as mild regularization.</p>
+
+<h2 id="layer-norm">Layer Normalization</h2>
+
+<p>Similar to BatchNorm, but normalizes over <strong>features/channels</strong> rather than over the batch:</p>
+<ul>
+  <li>Computes statistics per sample (not per batch)</li>
+  <li>Works with any batch size (including batch size 1)</li>
+  <li>Preferred in <strong>transformers</strong> and sequence models</li>
+</ul>
+
+<h2 id="resnet-block">ResNet Block Structure</h2>
+
+<p>A typical ResNet block:</p>
+<pre><code>x &rarr; Conv &rarr; BN &rarr; ReLU &rarr; Conv &rarr; BN &rarr; (+x) &rarr; ReLU</code></pre>
+
+<p>When dimensions change (e.g., downsampling), a 1&times;1 convolution is applied to the skip connection to match dimensions.</p>
+
+<h2 id="loss-surface">Effect on Loss Surfaces</h2>
+<p>Research shows that residual connections and batch normalization make loss surfaces dramatically <strong>smoother</strong>, with fewer sharp local minima. This enables stable training and better convergence.</p>
+
+<h2 id="architectures">Notable Architectures</h2>
+
+<table>
+  <tr><th>Architecture</th><th>Key Idea</th></tr>
+  <tr><td><strong>ResNet</strong> (2016)</td><td>Residual connections. Trained up to 200+ layers.</td></tr>
+  <tr><td><strong>DenseNet</strong></td><td>Each layer receives input from <em>all</em> previous layers (concatenation)</td></tr>
+  <tr><td><strong>U-Net</strong></td><td>Encoder-decoder with skip connections at each resolution level</td></tr>
+  <tr><td><strong>Hourglass Networks</strong></td><td>Stacked encoder-decoder modules for pose estimation</td></tr>
+</table>
+
+<div class="nav-footer">
+  <a href="cnns.html">&larr; CNNs</a>
+  <a href="pytorch.html">PyTorch Core &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

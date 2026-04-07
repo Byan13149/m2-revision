@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RL Algorithms - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs</a></li></ul></li>
+    <li class="expanded"><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html" class="active">RL Algorithms (L14&ndash;L15)</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Reinforcement Learning &raquo; RL Algorithms</div>
+
+<h1>RL Algorithms</h1>
+<p><strong>Lectures:</strong> L14&ndash;L15 &bull; <strong>Prince:</strong> Chapter 19</p>
+
+<h2 id="tabular">Tabular RL</h2>
+<p>When $|S|$ and $|A|$ are small enough to store $v[s]$ or $q[s,a]$ in a table.</p>
+
+<h3 id="dp">Dynamic Programming (Model Known)</h3>
+<p><strong>Policy Iteration:</strong></p>
+<ol>
+  <li><strong>Policy Evaluation:</strong> Compute $v[s]$ for current policy $\pi$ by sweeping through states and applying Bellman backups until convergence</li>
+  <li><strong>Policy Improvement:</strong> Greedily update $\pi(s) \leftarrow \arg\max_a q[s,a]$</li>
+  <li>Repeat until policy stops changing</li>
+</ol>
+
+<p><strong>Value Iteration:</strong> Directly apply Bellman optimality:</p>
+<div class="formula">
+$$v[s] \leftarrow \max_a \left( r[s,a] + \gamma \sum_{s'} \Pr(s'|s,a) \, v[s'] \right)$$
+</div>
+<p>Simpler than policy iteration. The greedy policy at convergence is optimal.</p>
+
+<h3 id="mc">Monte Carlo Methods (Model Unknown)</h3>
+<p>Estimate values by averaging <strong>complete returns</strong> from sampled episodes.</p>
+<ul>
+  <li>No bootstrapping (don't use value estimates in the update)</li>
+  <li><strong>Pros:</strong> unbiased targets</li>
+  <li><strong>Cons:</strong> high variance; must wait until episode ends</li>
+</ul>
+<p>MC control loop:</p>
+<ol>
+  <li>Generate episodes using current policy (with $\epsilon$-greedy for exploration)</li>
+  <li>For each visited $(s,a)$, compute empirical return</li>
+  <li>Update $q[s,a]$ as the average of observed returns</li>
+  <li>Improve policy greedily</li>
+</ol>
+
+<h3 id="td">Temporal Difference (TD) Learning</h3>
+<p>Combines strengths of DP and MC: learns from experience (like MC) but bootstraps (like DP).</p>
+
+<h4>TD Error</h4>
+<div class="formula">
+$$\delta_t = r_{t+1} + \gamma \, v[s_{t+1}] - v[s_t]$$
+</div>
+<p>Measures the discrepancy between the current estimate and the one-step-ahead estimate.</p>
+
+<h4>SARSA (On-Policy TD)</h4>
+<div class="formula">
+$$q[s_t, a_t] \leftarrow q[s_t, a_t] + \alpha \left( r_{t+1} + \gamma \, q[s_{t+1}, a_{t+1}] - q[s_t, a_t] \right)$$
+</div>
+<p>Uses the <strong>actual next action</strong> $a_{t+1}$ sampled from $\pi$. Good when you care about safety during exploration.</p>
+
+<h4>Q-Learning (Off-Policy TD)</h4>
+<div class="formula">
+$$q[s_t, a_t] \leftarrow q[s_t, a_t] + \alpha \left( r_{t+1} + \gamma \max_{a'} q[s_{t+1}, a'] - q[s_t, a_t] \right)$$
+</div>
+<p>Uses $\max_{a'}$ instead of the actual next action. The behavior policy can explore freely while learning the optimal $q$-function.</p>
+
+<table class="comparison">
+  <tr><th></th><th>SARSA</th><th>Q-Learning</th></tr>
+  <tr><td>Policy</td><td>On-policy</td><td>Off-policy</td></tr>
+  <tr><td>Target action</td><td>$a_{t+1} \sim \pi$</td><td>$\arg\max_{a'} q[s_{t+1}, a']$</td></tr>
+  <tr><td>Learns value of</td><td>Current (exploratory) policy</td><td>Optimal greedy policy</td></tr>
+  <tr><td>Speed</td><td>Can be slower</td><td>Often faster</td></tr>
+  <tr><td>Stability</td><td>More stable</td><td>Can be less stable</td></tr>
+</table>
+
+<h2 id="deep-rl">Deep RL: Function Approximation</h2>
+<p>When $|S|$ is too large for tables (e.g., images), approximate $q[s,a]$ with a neural network $q[s, a, \boldsymbol{\phi}]$.</p>
+
+<h3>Fitted Q-Learning</h3>
+<ol>
+  <li>Collect transitions: $\mathcal{D} = \{(s_t, a_t, r_{t+1}, s_{t+1})\}$</li>
+  <li>Define target: $y_t = r_{t+1} + \gamma \max_{a'} q[s_{t+1}, a', \boldsymbol{\phi}]$</li>
+  <li>Minimize: $\mathcal{L} = \sum_t (q[s_t, a_t, \boldsymbol{\phi}] - y_t)^2$</li>
+</ol>
+
+<div class="admonition warning">
+  <div class="admonition-title">Instability: The Deadly Triad</div>
+  <p>Fitted Q-learning can be unstable due to three factors:</p>
+  <ol>
+    <li><strong>Moving target:</strong> $y_t$ depends on $\boldsymbol{\phi}$, which keeps changing</li>
+    <li><strong>Correlated samples:</strong> consecutive transitions are similar</li>
+    <li><strong>Off-policy + function approximation + bootstrapping</strong></li>
+  </ol>
+</div>
+
+<h3 id="dqn">Deep Q-Network (DQN)</h3>
+<p>Stabilizers that make deep Q-learning work:</p>
+<ul>
+  <li><strong>Experience replay:</strong> store transitions in a buffer; sample random mini-batches (breaks correlation)</li>
+  <li><strong>Target network:</strong> maintain frozen parameters $\boldsymbol{\phi}^-$ for computing targets; update periodically (stabilizes targets)</li>
+  <li><strong>Frame stacking:</strong> stack recent frames to handle partial observability</li>
+  <li><strong>$\epsilon$-greedy exploration</strong></li>
+</ul>
+
+<p>Architecture: a CNN maps stacked Atari frames to $q[s, a]$ for each discrete action.</p>
+
+<h3>Double DQN</h3>
+<p>Standard Q-learning overestimates values because $\max$ is biased. Fix: use one network to <strong>select</strong> the action, another to <strong>evaluate</strong> it:</p>
+<div class="formula">
+$$y_t = r_{t+1} + \gamma \, q\!\left[s_{t+1}, \arg\max_{a'} q[s_{t+1}, a', \boldsymbol{\phi}], \boldsymbol{\phi}^-\right]$$
+</div>
+
+<h2 id="policy-gradient">Policy Gradient Methods</h2>
+<p>Instead of learning $q$ and acting via argmax, directly optimize the policy $\pi[a \mid s, \boldsymbol{\theta}]$.</p>
+
+<div class="admonition note">
+  <div class="admonition-title">When to Use Policy Gradients</div>
+  <p>Value-based methods (Q-learning) require $\arg\max_a q(s,a)$, which is hard with continuous action spaces. Policy gradient methods work naturally with continuous actions.</p>
+</div>
+
+<h3>REINFORCE</h3>
+<p>The simplest policy gradient algorithm. The gradient of the expected return is:</p>
+<div class="formula">
+$$\nabla_\theta J(\theta) = \mathbb{E}_\pi \left[ \sum_t \nabla_\theta \log \pi[a_t \mid s_t, \theta] \cdot G_t \right]$$
+</div>
+<p>Increase probability of actions that led to high returns; decrease for low returns.</p>
+
+<h3>Actor-Critic</h3>
+<p>Use a <strong>critic</strong> (value network) to reduce variance of the policy gradient:</p>
+<ul>
+  <li><strong>Actor:</strong> policy network $\pi[a \mid s, \theta]$</li>
+  <li><strong>Critic:</strong> value network $v[s, \mathbf{w}]$</li>
+  <li>Replace $G_t$ with the <strong>advantage</strong>: $A_t = G_t - v[s_t]$ (or use TD error)</li>
+</ul>
+
+<h2 id="algo-taxonomy">Algorithm Taxonomy</h2>
+<table class="comparison">
+  <tr><th>Family</th><th>Learns</th><th>Examples</th><th>Action Space</th></tr>
+  <tr><td>Value-based</td><td>$q$ or $v$, act via argmax</td><td>Q-learning, DQN, Double DQN</td><td>Discrete</td></tr>
+  <tr><td>Policy-based</td><td>$\pi$ directly</td><td>REINFORCE</td><td>Any</td></tr>
+  <tr><td>Actor-Critic</td><td>Both $\pi$ and $v$</td><td>A2C, PPO</td><td>Any</td></tr>
+</table>
+
+<div class="nav-footer">
+  <a href="rl-foundations.html">&larr; RL Foundations</a>
+  <a href="pgm.html">PGMs &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

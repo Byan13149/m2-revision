@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M2 Deep Learning - Exam Revision</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>M2 Deep Learning</h1>
+    <p>MPhil DIS &mdash; Exam Revision</p>
+  </div>
+  <div class="sidebar-search">
+    <input type="text" placeholder="Search topics...">
+  </div>
+  <nav>
+    <ul>
+      <li><a href="index.html" class="active">Home</a></li>
+      <li>
+        <a href="#">Neural Networks Foundations</a>
+        <ul>
+          <li><a href="nn-review.html">NN Review (L01&ndash;L03)</a></li>
+          <li><a href="loss-functions.html">Loss Functions &amp; Training</a></li>
+          <li><a href="regularization.html">Regularization &amp; Generalization</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">Convolutional Networks</a>
+        <ul>
+          <li><a href="cnns.html">CNNs (L04&ndash;L05)</a></li>
+          <li><a href="residual-nets.html">Residual Networks</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">Practical Deep Learning</a>
+        <ul>
+          <li><a href="pytorch.html">PyTorch Core (L06)</a></li>
+          <li><a href="best-practices.html">Best Practices (L07&ndash;L08)</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">Transformers &amp; LLMs</a>
+        <ul>
+          <li><a href="transformers.html">Transformers (L08&ndash;L10)</a></li>
+          <li><a href="llms.html">LLMs &amp; Decoding (L11)</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">Reinforcement Learning</a>
+        <ul>
+          <li><a href="rl-foundations.html">RL Foundations (L12&ndash;L13)</a></li>
+          <li><a href="rl-algorithms.html">RL Algorithms (L14&ndash;L15)</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">Generative Models</a>
+        <ul>
+          <li><a href="pgm.html">Probabilistic Graphical Models (L16)</a></li>
+          <li><a href="vae.html">Variational Autoencoders (L17)</a></li>
+          <li><a href="flows.html">Normalizing Flows (L18)</a></li>
+          <li><a href="diffusion.html">Diffusion Models (L19&ndash;L21)</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<div class="main-content">
+  <h1>M2: Deep Learning &mdash; Exam Revision Guide</h1>
+  <p><strong>Course:</strong> MPhil in Data Intensive Science, Cambridge &mdash; Lent Term</p>
+  <p><strong>Lecturer:</strong> Miles Cranmer &bull; <strong>Textbook:</strong> <em>Understanding Deep Learning</em> by Simon J.D. Prince</p>
+  <p><strong>Assessment:</strong> 50% final coursework, 50% exam. Exam questions are similar to those in the textbook.</p>
+
+  <div class="admonition important">
+    <div class="admonition-title">Exam Scope</div>
+    <p>Lectures 1&ndash;21 are examinable. Lecture 22 (Research Methods) is <strong>not examinable</strong>. PGMs (L16) and some RL material are <em>not</em> covered in Prince; use the uploaded lecture notes for those.</p>
+  </div>
+
+  <h2>Topics Overview</h2>
+
+  <div class="topic-grid">
+    <div class="topic-card">
+      <h3><a href="nn-review.html">Neural Networks Review</a></h3>
+      <p>MLPs, activation functions, universal approximation, deep networks, composing piecewise-linear functions.</p>
+      <span class="badge badge-core">L01&ndash;L03 &bull; Prince Ch 3&ndash;5</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="loss-functions.html">Loss Functions &amp; Training</a></h3>
+      <p>Maximum likelihood, cross-entropy, backpropagation, SGD, Adam, momentum, learning rate schedules.</p>
+      <span class="badge badge-core">L02&ndash;L03 &bull; Prince Ch 5&ndash;7</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="regularization.html">Regularization &amp; Generalization</a></h3>
+      <p>Bias-variance tradeoff, double descent, L2/L1 regularization, dropout, early stopping, data augmentation.</p>
+      <span class="badge badge-core">L03 &bull; Prince Ch 8&ndash;9</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="cnns.html">Convolutional Neural Networks</a></h3>
+      <p>Convolution, padding, stride, channels, pooling, equivariance, AlexNet, VGG, YOLO, U-Net.</p>
+      <span class="badge badge-core">L04&ndash;L05 &bull; Prince Ch 10&ndash;11</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="pytorch.html">PyTorch Core</a></h3>
+      <p>Tensors, autograd, nn.Module, training loops, DataLoader, MLP vs CNN comparison.</p>
+      <span class="badge badge-practical">L06</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="best-practices.html">Best Practices</a></h3>
+      <p>Karpathy's recipe, debugging, loss curve diagnostics, hyperparameter tuning strategies.</p>
+      <span class="badge badge-practical">L07&ndash;L08</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="transformers.html">Transformers</a></h3>
+      <p>Self-attention, Q/K/V, multi-head attention, positional encoding, encoder/decoder, BERT, GPT, ViT.</p>
+      <span class="badge badge-core">L08&ndash;L10 &bull; Prince Ch 12</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="llms.html">LLMs &amp; Decoding</a></h3>
+      <p>Decoding strategies, temperature, top-k, beam search, RAG, multimodal LLMs, CLIP, speculative decoding.</p>
+      <span class="badge badge-core">L11</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="rl-foundations.html">RL Foundations</a></h3>
+      <p>MDPs, policies, value functions, Bellman equations, exploration vs exploitation.</p>
+      <span class="badge badge-rl">L12&ndash;L13 &bull; Prince Ch 19</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="rl-algorithms.html">RL Algorithms</a></h3>
+      <p>Dynamic programming, Monte Carlo, TD learning, Q-learning, SARSA, DQN, policy gradients, REINFORCE.</p>
+      <span class="badge badge-rl">L14&ndash;L15 &bull; Prince Ch 19</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="pgm.html">Probabilistic Graphical Models</a></h3>
+      <p>Directed PGMs, factorised joints, plates, Bayes rule, MLE vs MAP, generative stories.</p>
+      <span class="badge badge-generative">L16 &bull; Lecture notes</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="vae.html">Variational Autoencoders</a></h3>
+      <p>Latent variable models, ELBO, KL divergence, reparameterization trick, encoder-decoder.</p>
+      <span class="badge badge-generative">L17 &bull; Prince Ch 17</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="flows.html">Normalizing Flows</a></h3>
+      <p>Change of variables, Jacobian determinants, coupling layers, autoregressive flows, exact likelihoods.</p>
+      <span class="badge badge-generative">L18 &bull; Prince Ch 16</span>
+    </div>
+    <div class="topic-card">
+      <h3><a href="diffusion.html">Diffusion Models</a></h3>
+      <p>DDPM, forward/reverse process, noise schedules, ELBO, denoising score matching, classifier-free guidance.</p>
+      <span class="badge badge-generative">L19&ndash;L21 &bull; Prince Ch 18</span>
+    </div>
+  </div>
+
+  <h2>Quick Reference: Lecture-to-Chapter Mapping</h2>
+  <table>
+    <tr><th>Lectures</th><th>Topic</th><th>Prince Chapters</th></tr>
+    <tr><td>L01&ndash;L03</td><td>Neural Networks Review</td><td>Ch 3&ndash;7 (Shallow/Deep NNs, Loss, Training)</td></tr>
+    <tr><td>L03</td><td>Regularization &amp; Generalization</td><td>Ch 8&ndash;9</td></tr>
+    <tr><td>L04&ndash;L05</td><td>Convolutional Networks</td><td>Ch 10&ndash;11</td></tr>
+    <tr><td>L06</td><td>PyTorch Core</td><td>&mdash;</td></tr>
+    <tr><td>L07&ndash;L08</td><td>Best Practices</td><td>&mdash;</td></tr>
+    <tr><td>L08&ndash;L10</td><td>Transformers</td><td>Ch 12</td></tr>
+    <tr><td>L11</td><td>LLMs &amp; Decoding</td><td>Ch 12 (partial)</td></tr>
+    <tr><td>L12&ndash;L15</td><td>Reinforcement Learning</td><td>Ch 19</td></tr>
+    <tr><td>L16</td><td>Probabilistic Graphical Models</td><td>Lecture notes only</td></tr>
+    <tr><td>L17</td><td>Variational Autoencoders</td><td>Ch 17</td></tr>
+    <tr><td>L18</td><td>Normalizing Flows</td><td>Ch 16</td></tr>
+    <tr><td>L19&ndash;L21</td><td>Diffusion Models</td><td>Ch 18</td></tr>
+    <tr><td>L22</td><td>Research Methods</td><td><em>Not examinable</em></td></tr>
+  </table>
+
+  <div class="admonition tip">
+    <div class="admonition-title">Study Strategy</div>
+    <p>The prof says exam questions are similar to textbook problems. Work through the exercises at the end of each Prince chapter for the best preparation. Focus on being able to <strong>derive</strong> key results (ELBO, Bellman equations, backprop, change-of-variables) and <strong>explain</strong> architectural choices (why residual connections, why multi-head attention, why reparameterization trick).</p>
+  </div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Loss Functions &amp; Training - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li class="expanded"><a href="#">Neural Networks Foundations</a><ul>
+      <li><a href="nn-review.html">NN Review (L01&ndash;L03)</a></li>
+      <li><a href="loss-functions.html" class="active">Loss Functions &amp; Training</a></li>
+      <li><a href="regularization.html">Regularization &amp; Generalization</a></li>
+    </ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs &amp; Decoding</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Neural Networks Foundations &raquo; Loss Functions &amp; Training</div>
+
+<h1>Loss Functions &amp; Training</h1>
+<p><strong>Lectures:</strong> L02&ndash;L03 &bull; <strong>Prince:</strong> Chapters 5&ndash;7</p>
+
+<h2 id="recipe">The Recipe for Constructing Loss Functions</h2>
+
+<div class="key-concept">
+  <strong>General Recipe (from lectures):</strong>
+  <ol>
+    <li>Choose a probability distribution $\Pr(y \mid \boldsymbol{\phi})$ appropriate for your output domain</li>
+    <li>Use the network to predict the <strong>parameters</strong> of that distribution</li>
+    <li>Maximize the likelihood &rArr; minimize the <strong>negative log-likelihood</strong></li>
+  </ol>
+</div>
+
+<h2 id="mle">Maximum Likelihood Estimation</h2>
+
+<p>Given $N$ i.i.d. training examples $\{(\mathbf{x}_i, y_i)\}_{i=1}^N$, the likelihood is:</p>
+<div class="formula">
+$$\Pr(\{y_i\} \mid \boldsymbol{\phi}) = \prod_{i=1}^{N} \Pr(y_i \mid f[\mathbf{x}_i, \boldsymbol{\phi}])$$
+</div>
+
+<p>Taking the log (which is monotonic, so preserves the maximum):</p>
+<div class="formula">
+$$\log \Pr = \sum_{i=1}^{N} \log \Pr(y_i \mid f[\mathbf{x}_i, \boldsymbol{\phi}])$$
+</div>
+
+<p>We minimize the <strong>negative log-likelihood</strong> (NLL) as our loss:</p>
+<div class="formula">
+$$\mathcal{L}[\boldsymbol{\phi}] = -\sum_{i=1}^{N} \log \Pr(y_i \mid f[\mathbf{x}_i, \boldsymbol{\phi}])$$
+</div>
+
+<h2 id="regression">Example 1: Univariate Regression</h2>
+
+<p><strong>Output domain:</strong> $y \in \mathbb{R}$</p>
+<p><strong>Distribution:</strong> Normal $\Pr(y \mid \mu, \sigma^2) = \mathcal{N}(y; \mu, \sigma^2)$</p>
+<p><strong>Network predicts:</strong> $\mu = f[\mathbf{x}, \boldsymbol{\phi}]$</p>
+
+<p>The negative log-likelihood becomes:</p>
+<div class="formula">
+$$\mathcal{L} = \sum_{i=1}^N \frac{(y_i - f[\mathbf{x}_i, \boldsymbol{\phi}])^2}{2\sigma^2} + \text{const}$$
+</div>
+
+<div class="admonition note">
+  <div class="admonition-title">This is just Least Squares!</div>
+  <p>When $\sigma^2$ is constant across examples, minimizing the NLL is equivalent to minimizing the <strong>mean squared error (MSE)</strong>. The variance $\sigma^2$ disappears from the optimization.</p>
+</div>
+
+<h3>Heteroscedastic Regression</h3>
+<p>The network can also predict $\sigma^2(\mathbf{x})$ &mdash; making the noise input-dependent. The network has two outputs: $\mu$ and $\sigma^2$. The loss then retains the $\sigma^2$ terms.</p>
+
+<h2 id="binary-classification">Example 2: Binary Classification</h2>
+
+<p><strong>Output domain:</strong> $y \in \{0, 1\}$</p>
+<p><strong>Distribution:</strong> Bernoulli with parameter $\lambda \in [0,1]$</p>
+<p><strong>Problem:</strong> Network output can be anything in $\mathbb{R}$</p>
+<p><strong>Solution:</strong> Pass through the logistic sigmoid $\sigma(z) = \frac{1}{1+e^{-z}}$</p>
+
+<div class="formula">
+$$\lambda = \sigma(f[\mathbf{x}, \boldsymbol{\phi}])$$
+</div>
+
+<p>The NLL gives the <strong>binary cross-entropy loss</strong>:</p>
+<div class="formula">
+$$\mathcal{L} = -\sum_{i=1}^{N} \left[ y_i \log \lambda_i + (1-y_i) \log(1-\lambda_i) \right]$$
+</div>
+
+<p><strong>Inference:</strong> Predict $y=1$ where $\lambda > 0.5$.</p>
+
+<h2 id="multiclass">Example 3: Multiclass Classification</h2>
+
+<p><strong>Output domain:</strong> $y \in \{1, 2, \ldots, K\}$</p>
+<p><strong>Distribution:</strong> Categorical</p>
+<p><strong>Solution:</strong> Softmax maps $K$ network outputs to a probability distribution:</p>
+
+<div class="formula">
+$$\Pr(y=k) = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}$$
+</div>
+
+<p>The NLL gives the <strong>categorical cross-entropy loss</strong>:</p>
+<div class="formula">
+$$\mathcal{L} = -\sum_{i=1}^{N} \log \Pr(y_i \mid \mathbf{x}_i, \boldsymbol{\phi})$$
+</div>
+
+<h2 id="summary-losses">Summary of Loss Functions</h2>
+
+<table class="comparison">
+  <tr><th>Task</th><th>Distribution</th><th>Output Transform</th><th>Loss</th></tr>
+  <tr><td>Regression</td><td>Normal</td><td>Identity</td><td>MSE (Least Squares)</td></tr>
+  <tr><td>Binary classification</td><td>Bernoulli</td><td>Sigmoid</td><td>Binary Cross-Entropy</td></tr>
+  <tr><td>Multiclass classification</td><td>Categorical</td><td>Softmax</td><td>Categorical Cross-Entropy</td></tr>
+</table>
+
+<h2 id="optimizers">Optimization Algorithms (Ch 6)</h2>
+
+<h3>Gradient Descent</h3>
+<div class="formula">
+$$\boldsymbol{\phi} \leftarrow \boldsymbol{\phi} - \alpha \nabla_{\boldsymbol{\phi}} \mathcal{L}[\boldsymbol{\phi}]$$
+</div>
+<p>where $\alpha$ is the learning rate.</p>
+
+<h3>Stochastic Gradient Descent (SGD)</h3>
+<p>Instead of computing the gradient over all $N$ examples, use a <strong>mini-batch</strong> of size $B$:</p>
+<div class="formula">
+$$\boldsymbol{\phi} \leftarrow \boldsymbol{\phi} - \alpha \frac{1}{B}\sum_{i \in \mathcal{B}} \nabla_{\boldsymbol{\phi}} \ell_i$$
+</div>
+<ul>
+  <li>Cheaper per step: $O(B)$ instead of $O(N)$</li>
+  <li>Noise from mini-batches helps escape local minima</li>
+  <li>Acts as implicit regularization</li>
+</ul>
+
+<h3>Momentum</h3>
+<p>Exponential moving average of gradients for faster convergence:</p>
+<div class="formula">
+$$\mathbf{m}_t = \beta \mathbf{m}_{t-1} + (1-\beta) \nabla \mathcal{L}$$
+$$\boldsymbol{\phi} \leftarrow \boldsymbol{\phi} - \alpha \mathbf{m}_t$$
+</div>
+<p>Typical: $\beta = 0.9$.</p>
+
+<h3>Adam</h3>
+<p>Adaptive per-parameter learning rates with bias correction. Combines momentum with RMSProp:</p>
+<div class="formula">
+$$m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t$$
+$$v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2$$
+$$\hat{m}_t = m_t / (1 - \beta_1^t), \quad \hat{v}_t = v_t / (1 - \beta_2^t)$$
+$$\phi \leftarrow \phi - \alpha \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}$$
+</div>
+<p>Default hyperparameters: $\alpha = 10^{-3}$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon = 10^{-8}$.</p>
+
+<div class="admonition tip">
+  <div class="admonition-title">Practical Default</div>
+  <p>In the course, the recommended starting point is <strong>Adam with lr=3e-4 and cosine decay</strong>. This is a robust choice for most tasks before any tuning.</p>
+</div>
+
+<h2 id="learning-rate">Learning Rate Schedules</h2>
+
+<table>
+  <tr><th>Schedule</th><th>Description</th></tr>
+  <tr><td>Constant</td><td>Fixed learning rate throughout training</td></tr>
+  <tr><td>Step decay</td><td>Reduce by factor every $k$ epochs</td></tr>
+  <tr><td>Cosine decay</td><td>$\alpha_t = \alpha_0 \cdot \frac{1}{2}(1 + \cos(\pi t / T))$ &mdash; smooth annealing to zero</td></tr>
+  <tr><td>Warmup + decay</td><td>Linearly increase for first few steps, then decay</td></tr>
+</table>
+
+<div class="nav-footer">
+  <a href="nn-review.html">&larr; NN Review</a>
+  <a href="regularization.html">Regularization &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

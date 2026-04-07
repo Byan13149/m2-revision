@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Convolutional Neural Networks - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li class="expanded"><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html" class="active">CNNs (L04&ndash;L05)</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs &amp; Decoding</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Convolutional Networks &raquo; CNNs</div>
+
+<h1>Convolutional Neural Networks</h1>
+<p><strong>Lectures:</strong> L04&ndash;L05 &bull; <strong>Prince:</strong> Chapters 10&ndash;11</p>
+
+<h2 id="motivation">Motivation: Problems with Fully-Connected Networks for Images</h2>
+<ol>
+  <li><strong>Size:</strong> A 224&times;224 RGB image = 150,528 dimensions. One FC hidden layer &rArr; ~22 billion weights</li>
+  <li><strong>Spatial structure:</strong> Nearby pixels are statistically related; FC networks ignore this</li>
+  <li><strong>Translation:</strong> The same object at different locations should be recognized identically</li>
+</ol>
+
+<h2 id="invariance-equivariance">Invariance and Equivariance</h2>
+
+<div class="key-concept">
+  <strong>Invariance:</strong> $f[t[\mathbf{x}]] = f[\mathbf{x}]$ &mdash; output unchanged by transformation. Example: image classification should be invariant to translation.<br><br>
+  <strong>Equivariance:</strong> $f[t[\mathbf{x}]] = t[f[\mathbf{x}]]$ &mdash; output transforms the same way as input. Example: segmentation maps should shift when the image shifts.
+</div>
+
+<p>Convolution is <strong>equivariant to translation</strong> by construction.</p>
+
+<h2 id="convolution-1d">1D Convolution</h2>
+
+<p>Output is a weighted sum of neighbors using a <strong>kernel</strong> (filter):</p>
+<div class="formula">
+$$y_i = \sum_{k=0}^{K-1} w_k \cdot x_{i+k} + b$$
+</div>
+<p>where $K$ is the kernel size.</p>
+
+<h3>Key Parameters</h3>
+<table>
+  <tr><th>Parameter</th><th>Effect</th></tr>
+  <tr><td><strong>Kernel size</strong> $K$</td><td>Number of input positions combined per output. More parameters but larger receptive field.</td></tr>
+  <tr><td><strong>Stride</strong> $s$</td><td>Shift by $s$ positions per output. Stride &gt; 1 decreases output size (downsampling).</td></tr>
+  <tr><td><strong>Dilation</strong> $d$</td><td>Intersperse kernel values with zeros. Larger receptive field without more parameters.</td></tr>
+  <tr><td><strong>Padding</strong></td><td><em>Zero padding</em>: pad input with zeros to maintain size. <em>Valid</em>: no padding, output is smaller.</td></tr>
+</table>
+
+<div class="admonition warning">
+  <div class="admonition-title">Convention Warning</div>
+  <p>Always check convention! Sometimes dilation=1 means standard behavior (no dilation), sometimes dilation=0 does.</p>
+</div>
+
+<h3>Convolution as Special Case of FC</h3>
+<p>A convolutional layer is a fully-connected layer with <strong>shared weights</strong> and <strong>sparse connections</strong>. The weight matrix has a banded (Toeplitz) structure with repeated entries.</p>
+
+<h2 id="channels">Channels (Feature Maps)</h2>
+
+<p>A single convolution loses information. Solution: apply <strong>multiple convolutions</strong> and stack the results as channels.</p>
+
+<h3>Parameter Count</h3>
+<div class="formula">
+$$\text{Parameters} = C_\text{out} \times (C_\text{in} \times K + 1)$$
+</div>
+<p>For 2D convolution with kernel $K \times K$:</p>
+<div class="formula">
+$$\text{Parameters} = C_\text{out} \times (C_\text{in} \times K^2 + 1)$$
+</div>
+
+<h2 id="receptive-fields">Receptive Fields</h2>
+
+<p>The <strong>receptive field</strong> of a unit is the region of the input that influences its value. With deeper layers, the receptive field grows, allowing the network to capture larger-scale patterns while keeping kernels small.</p>
+
+<h2 id="2d-conv">2D Convolution</h2>
+
+<p>Same principles as 1D, but the kernel is $K \times K$. Weighted sum over a 2D region:</p>
+<div class="formula">
+$$y_{i,j} = \sum_{m=0}^{K-1}\sum_{n=0}^{K-1} w_{m,n} \cdot x_{i+m, j+n} + b$$
+</div>
+
+<h2 id="pooling">Downsampling and Upsampling</h2>
+
+<h3>Downsampling Methods</h3>
+<ul>
+  <li><strong>Strided convolution:</strong> stride &gt; 1 (e.g., stride 2 halves each spatial dimension)</li>
+  <li><strong>Max pooling:</strong> take maximum over a window. Provides partial translation invariance.</li>
+  <li><strong>Mean pooling:</strong> take average over a window</li>
+</ul>
+
+<h3>Upsampling Methods</h3>
+<ul>
+  <li><strong>Nearest-neighbor:</strong> duplicate pixels</li>
+  <li><strong>Bilinear interpolation:</strong> weighted average of neighbors</li>
+  <li><strong>Max-unpooling:</strong> place value at remembered max position</li>
+  <li><strong>Transposed convolution:</strong> learnable upsampling (inserts zeros, then convolves)</li>
+</ul>
+
+<h3>1&times;1 Convolution</h3>
+<p>Mixes channels without spatial interaction. Equivalent to applying a fully-connected layer independently at each spatial position. Can change the number of channels.</p>
+
+<h2 id="architectures">Key Architectures</h2>
+
+<h3>AlexNet (2012)</h3>
+<ul>
+  <li>60 million parameters (most in FC layers)</li>
+  <li>Data augmentation (2048&times;), dropout in FC layers</li>
+  <li>SGD with momentum 0.9, batch size 128, L2 weight decay</li>
+  <li>16.4% top-5 error on ImageNet</li>
+</ul>
+
+<h3>VGG (2015)</h3>
+<ul>
+  <li>19 layers, 144M parameters</li>
+  <li>Only 3&times;3 convolutions (stack to get larger receptive fields)</li>
+  <li>6.8% top-5 error</li>
+</ul>
+
+<h3>YOLO (Object Detection)</h3>
+<ul>
+  <li>Predicts bounding boxes and class probabilities on a 7&times;7 grid</li>
+  <li>Each grid cell predicts 2 boxes (x, y, h, w, confidence)</li>
+  <li>Single forward pass &rArr; real-time detection</li>
+</ul>
+
+<h3>U-Net (2016, Segmentation)</h3>
+<ul>
+  <li>Encoder-decoder architecture with skip connections</li>
+  <li>Skip connections concatenate encoder features with decoder features at the same resolution</li>
+  <li>Widely used in medical imaging and scientific applications</li>
+</ul>
+
+<h2 id="inductive-bias">Why CNNs Work Better Than FC Networks</h2>
+
+<div class="admonition tip">
+  <div class="admonition-title">Inductive Bias</div>
+  <p>CNNs have a better <strong>inductive bias</strong> (prior on the space of functions) for image-like data:
+  <ul>
+    <li>Weight sharing forces the network to process each location similarly</li>
+    <li>Local connectivity exploits spatial structure</li>
+    <li>Searches through a smaller family of functions, all of which are plausible for images</li>
+  </ul>
+  Result: far fewer parameters with better generalization. In MNIST-1D, a CNN with 2,050 parameters outperforms a FC network with 150,185 parameters.
+  </p>
+</div>
+
+<div class="nav-footer">
+  <a href="regularization.html">&larr; Regularization</a>
+  <a href="residual-nets.html">Residual Networks &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

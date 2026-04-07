@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diffusion Models - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li class="expanded"><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html" class="active">Diffusion (L19&ndash;L21)</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Generative Models &raquo; Diffusion Models</div>
+
+<h1>Diffusion Models</h1>
+<p><strong>Lectures:</strong> L19&ndash;L21 &bull; <strong>Prince:</strong> Chapter 18</p>
+
+<h2 id="overview">Overview</h2>
+<p>Diffusion models (DDPM) are currently the state-of-the-art for image generation. The core idea:</p>
+<ol>
+  <li><strong>Forward process:</strong> Gradually add Gaussian noise over $T$ steps until data becomes pure noise</li>
+  <li><strong>Reverse process:</strong> Learn a neural network to denoise one step at a time</li>
+  <li><strong>Sampling:</strong> Start from pure noise and iteratively denoise to generate data</li>
+</ol>
+
+<h2 id="forward">Forward (Diffusion) Process</h2>
+
+<p>At each step $t$, add a small amount of Gaussian noise:</p>
+<div class="formula">
+$$q(\mathbf{z}_t \mid \mathbf{z}_{t-1}) = \mathcal{N}(\mathbf{z}_t; \sqrt{1-\beta_t}\,\mathbf{z}_{t-1}, \beta_t \mathbf{I})$$
+</div>
+<p>where $\{\beta_t\}_{t=1}^T$ is the <strong>noise schedule</strong> (variance schedule), typically $\beta_1 = 10^{-4}$ to $\beta_T = 0.02$.</p>
+
+<h3>Key Shortcut: Jump to Any Step</h3>
+<p>Define $\alpha_t = 1 - \beta_t$ and $\bar{\alpha}_t = \prod_{s=1}^{t} \alpha_s$. Then:</p>
+<div class="formula">
+$$q(\mathbf{z}_t \mid \mathbf{x}) = \mathcal{N}(\mathbf{z}_t; \sqrt{\bar{\alpha}_t}\,\mathbf{x}, (1-\bar{\alpha}_t)\mathbf{I})$$
+</div>
+
+<div class="key-concept">
+  <strong>Interpretation:</strong> $\mathbf{z}_t$ is a mixture of the original data $\mathbf{x}$ and noise $\boldsymbol{\epsilon}$:
+  $$\mathbf{z}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{x} + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}, \quad \boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$$
+</div>
+
+<h2 id="reverse">Reverse (Denoising) Process</h2>
+
+<p>The reverse process is also Gaussian (for small $\beta_t$):</p>
+<div class="formula">
+$$\Pr(\mathbf{z}_{t-1} \mid \mathbf{z}_t, \boldsymbol{\phi}) = \mathcal{N}(\mathbf{z}_{t-1}; \boldsymbol{\mu}_\phi(\mathbf{z}_t, t), \sigma_t^2 \mathbf{I})$$
+</div>
+<p>A neural network (typically U-Net) predicts $\boldsymbol{\mu}_\phi$ (or equivalently, the noise $\boldsymbol{\epsilon}$).</p>
+
+<h2 id="training">Training: Simplified Loss</h2>
+
+<h3>From ELBO to Simple Loss</h3>
+<p>The ELBO for diffusion models decomposes into a sum of KL divergence terms between pairs of consecutive steps $(t-1, t)$. After simplification, the training loss reduces to:</p>
+
+<div class="formula">
+$$\mathcal{L}_\text{simple} = \mathbb{E}_{t, \mathbf{x}, \boldsymbol{\epsilon}}\left[\|\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\phi(\mathbf{z}_t, t)\|^2\right]$$
+</div>
+
+<div class="admonition tip">
+  <div class="admonition-title">Training Algorithm</div>
+  <ol>
+    <li>Sample a data point $\mathbf{x}$ from the training set</li>
+    <li>Sample a random timestep $t \sim \text{Uniform}\{1, \ldots, T\}$</li>
+    <li>Sample noise $\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$</li>
+    <li>Compute noisy version: $\mathbf{z}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{x} + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\epsilon}$</li>
+    <li>Train the network to predict $\boldsymbol{\epsilon}$ from $(\mathbf{z}_t, t)$: minimize $\|\boldsymbol{\epsilon} - \boldsymbol{\epsilon}_\phi(\mathbf{z}_t, t)\|^2$</li>
+  </ol>
+</div>
+
+<h2 id="elbo-derivation">ELBO Derivation (L21)</h2>
+
+<h3>Graphical Model</h3>
+<p>Forward model (reverse diffusion): $\Pr(\mathbf{x}, \mathbf{z}_{1:T}) = \Pr(\mathbf{z}_T) \prod_{t=1}^{T} \Pr(\mathbf{z}_{t-1} \mid \mathbf{z}_t)$</p>
+<p>Variational approximation (diffusion process): $q(\mathbf{z}_{1:T} \mid \mathbf{x}) = \prod_{t=1}^{T} q(\mathbf{z}_t \mid \mathbf{z}_{t-1})$</p>
+
+<h3>ELBO Decomposition</h3>
+<p>Apply the ELBO trick and use the causal structure of the graphical model to get terms that only involve consecutive timesteps $(t-1, t)$:</p>
+<div class="formula">
+$$\text{ELBO} = \mathbb{E}_q\!\left[\log \Pr(\mathbf{x} \mid \mathbf{z}_1)\right] - \sum_{t=2}^{T} \mathbb{E}_q\!\left[D_\text{KL}(q(\mathbf{z}_{t-1} \mid \mathbf{z}_t, \mathbf{x}) \| \Pr(\mathbf{z}_{t-1} \mid \mathbf{z}_t))\right] - D_\text{KL}(q(\mathbf{z}_T \mid \mathbf{x}) \| \Pr(\mathbf{z}_T))$$
+</div>
+
+<p>Each KL term is between two Gaussians &rArr; closed-form. The KL between two Gaussians $\mathcal{N}(\boldsymbol{\mu}_1, \boldsymbol{\Sigma}_1)$ and $\mathcal{N}(\boldsymbol{\mu}_2, \boldsymbol{\Sigma}_2)$ has an analytic formula.</p>
+
+<h2 id="sampling">Sampling</h2>
+<ol>
+  <li>Start: $\mathbf{z}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$</li>
+  <li>For $t = T, T-1, \ldots, 1$: compute $\mathbf{z}_{t-1}$ using the learned reverse process</li>
+  <li>Output: $\mathbf{z}_0 \approx \mathbf{x}$</li>
+</ol>
+
+<h2 id="conditioning">Conditioning and Guidance</h2>
+
+<h3>Classifier Guidance</h3>
+<p>Use a separate classifier $p(y \mid \mathbf{z}_t)$ to guide the diffusion process toward a desired class. Add the classifier gradient to the denoising step.</p>
+
+<h3>Classifier-Free Guidance</h3>
+<p>Train a single model that can be both conditional and unconditional. At sampling time, interpolate between the two:</p>
+<div class="formula">
+$$\tilde{\boldsymbol{\epsilon}}_\phi = (1 + w) \boldsymbol{\epsilon}_\phi(\mathbf{z}_t, t, y) - w \cdot \boldsymbol{\epsilon}_\phi(\mathbf{z}_t, t, \varnothing)$$
+</div>
+<p>where $w > 0$ controls guidance strength. Higher $w$ &rArr; more adherence to the conditioning (e.g., text prompt) but less diversity.</p>
+
+<h2 id="ddim">DDIM: Faster Sampling</h2>
+<p>DDPM requires $T$ steps (often 1000). DDIM (Denoising Diffusion Implicit Models) provides a deterministic, non-Markovian sampling process that can skip steps, allowing generation in far fewer steps (e.g., 50).</p>
+
+<h2 id="applications">Applications</h2>
+<ul>
+  <li><strong>Text-to-image:</strong> DALL-E 2, Imagen, Stable Diffusion</li>
+  <li><strong>Image editing:</strong> inpainting, super-resolution</li>
+  <li><strong>Scientific:</strong> molecular generation, protein structure</li>
+</ul>
+
+<h2 id="comparison">Generative Models Comparison</h2>
+<table class="comparison">
+  <tr><th></th><th>VAEs</th><th>Flows</th><th>Diffusion</th><th>GANs</th></tr>
+  <tr><td>Likelihood</td><td>ELBO (lower bound)</td><td>Exact</td><td>ELBO (but tight)</td><td>None</td></tr>
+  <tr><td>Sample quality</td><td>Blurry</td><td>Good</td><td>State-of-the-art</td><td>High (mode collapse risk)</td></tr>
+  <tr><td>Sampling speed</td><td>Fast (1 pass)</td><td>Fast (1 pass)</td><td>Slow ($T$ steps)</td><td>Fast (1 pass)</td></tr>
+  <tr><td>Training stability</td><td>Stable</td><td>Stable</td><td>Stable</td><td>Notoriously unstable</td></tr>
+  <tr><td>Architecture</td><td>Arbitrary</td><td>Must be invertible</td><td>U-Net typical</td><td>Generator + discriminator</td></tr>
+</table>
+
+<div class="nav-footer">
+  <a href="flows.html">&larr; Normalizing Flows</a>
+  <a href="index.html">Home &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

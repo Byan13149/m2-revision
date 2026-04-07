@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LLMs &amp; Decoding - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li class="expanded"><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html" class="active">LLMs &amp; Decoding (L11)</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Transformers &amp; LLMs &raquo; LLMs &amp; Decoding</div>
+
+<h1>LLMs &amp; Decoding Strategies</h1>
+<p><strong>Lecture:</strong> L11 &bull; <strong>Prince:</strong> Chapter 12 (partial)</p>
+
+<h2 id="decoder-only">Decoder-Only Transformers</h2>
+<p>The most common LLM architecture (GPT, LLaMA, Mixtral). Each token attends only to itself and previous tokens via <strong>causal masking</strong>. The final token's contextualized embedding is mapped to a probability distribution over the vocabulary.</p>
+
+<h2 id="decoding">From Vectors to Words</h2>
+<p>The transformer outputs a vector for the final position. An MLP (or single linear layer) + softmax converts this to a probability distribution over the vocabulary:</p>
+<div class="formula">
+$$P(w_i) = \text{softmax}(\mathbf{W}_\text{head} \cdot \mathbf{h}_\text{final} + \mathbf{b})_i$$
+</div>
+
+<h2 id="strategies">Decoding Strategies</h2>
+
+<h3>Greedy Search (Argmax)</h3>
+<p>Select the most probable token at each step. Simple and fast, but produces repetitive, predictable text.</p>
+
+<h3>Beam Search</h3>
+<p>Maintain $B$ candidate sequences (beams) at each step. Expand each by all vocabulary tokens, keep top-$B$ by cumulative probability. Produces more coherent output than greedy.</p>
+
+<h3>Temperature Sampling</h3>
+<p>Sharpen or flatten the distribution before sampling:</p>
+<div class="formula">
+$$P(w_i) = \frac{e^{z_i / T}}{\sum_j e^{z_j / T}}$$
+</div>
+<ul>
+  <li>$T = 1$: standard sampling</li>
+  <li>$T < 1$: sharper distribution &rArr; more deterministic, coherent</li>
+  <li>$T > 1$: flatter distribution &rArr; more random, creative</li>
+  <li>$T \to 0$: converges to greedy (argmax)</li>
+</ul>
+
+<h3>Top-k Sampling</h3>
+<p>Restrict sampling to only the top $k$ most probable tokens. Reduces nonsensical outputs while maintaining diversity.</p>
+
+<h3>Top-p (Nucleus) Sampling</h3>
+<p>Choose the smallest set of tokens whose cumulative probability exceeds threshold $p$. More adaptive than top-k: narrows or widens dynamically based on the model's confidence.</p>
+
+<h2 id="advanced-decoding">Advanced Decoding</h2>
+
+<h3>Speculative Decoding</h3>
+<ol>
+  <li>A smaller, faster model generates candidate tokens speculatively</li>
+  <li>The large model verifies these tokens <strong>in parallel</strong></li>
+  <li>Accept correct tokens; regenerate from the first mistake</li>
+</ol>
+<p>Significant speedup without compromising output quality.</p>
+
+<h3>Structured Decoding</h3>
+<p>Constrain the LLM to produce specific output formats (JSON, multiple choice, regex patterns) by filtering the vocabulary at each step. Libraries like <code>outlines</code> implement this.</p>
+
+<h2 id="rag">Retrieval-Augmented Generation (RAG)</h2>
+<p>Combines retrieval with generation to address hallucinations and factual inaccuracy:</p>
+<ol>
+  <li>Convert the query into an embedding</li>
+  <li>Retrieve relevant documents via nearest-neighbor search in embedding space</li>
+  <li>Prepend retrieved documents as context for the LLM</li>
+</ol>
+<p>Retrieval is based on <strong>semantic similarity</strong> (embedding dot products), not just keyword matching.</p>
+
+<h2 id="multimodal">Multimodal LLMs</h2>
+<p>Process multiple modalities (text, images, audio) within a single model by converting everything to tokens.</p>
+
+<h3>Vision Transformers (ViT)</h3>
+<p>Treat image patches as tokens. Flatten, embed, add positional encodings, process with transformer blocks.</p>
+
+<h3>CLIP (Contrastive Language-Image Pretraining)</h3>
+<p>Trained on image-text pairs using contrastive learning:</p>
+<div class="formula">
+$$\mathcal{L} = -\frac{1}{2N}\sum_{i=1}^{N}\left[\log\frac{\exp(\mathbf{v}_i^\top \mathbf{u}_i)}{\sum_j \exp(\mathbf{v}_i^\top \mathbf{u}_j)} + \log\frac{\exp(\mathbf{v}_i^\top \mathbf{u}_i)}{\sum_j \exp(\mathbf{v}_j^\top \mathbf{u}_i)}\right]$$
+</div>
+<p>where $\mathbf{v}_i$ = image embedding, $\mathbf{u}_i$ = text embedding. Matches images with their correct text descriptions in a shared space. Enables <strong>zero-shot classification</strong>: compare image embedding against text embeddings of candidate labels.</p>
+
+<h2 id="summary-decoding">Summary: Decoding Tradeoffs</h2>
+<table class="comparison">
+  <tr><th>Method</th><th>Fluency</th><th>Coherence</th><th>Diversity</th><th>Speed</th></tr>
+  <tr><td>Greedy</td><td>Medium</td><td>High</td><td>Low</td><td>Fast</td></tr>
+  <tr><td>Beam search</td><td>High</td><td>High</td><td>Low</td><td>Moderate</td></tr>
+  <tr><td>Temperature</td><td>Varies</td><td>Varies</td><td>High (high T)</td><td>Fast</td></tr>
+  <tr><td>Top-k</td><td>Good</td><td>Good</td><td>Moderate</td><td>Fast</td></tr>
+  <tr><td>Top-p</td><td>Good</td><td>Good</td><td>Adaptive</td><td>Fast</td></tr>
+</table>
+
+<div class="nav-footer">
+  <a href="transformers.html">&larr; Transformers</a>
+  <a href="rl-foundations.html">RL Foundations &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

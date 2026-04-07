@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Best Practices - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li class="expanded"><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html" class="active">Best Practices (L07&ndash;L08)</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Practical Deep Learning &raquo; Best Practices</div>
+
+<h1>Training Best Practices</h1>
+<p><strong>Lectures:</strong> L07&ndash;L08</p>
+
+<h2 id="recipe">Karpathy's Training Recipe</h2>
+<div class="admonition important">
+  <div class="admonition-title">Neural networks fail silently</div>
+  <p>They can fit around bugs. They learn "something" even when your pipeline is broken. Be a <strong>conspiracy theorist</strong>: don't believe anything is working; verify every step.</p>
+</div>
+
+<ol>
+  <li><strong>Become one with the data.</strong> Spend hours inspecting your dataset before touching any ML. Look for duplicates, corrupted labels, class imbalances, strange min/max values.</li>
+  <li><strong>Build a simple end-to-end pipeline.</strong> Start with a linear model. Confirm the loss starts at the expected value (e.g., $-\log(1/K)$ for $K$-class classification). Beat an input-independent baseline.</li>
+  <li><strong>Overfit on a small batch (~1%).</strong> Use a slightly larger model. Drive training loss to near zero. This confirms no hidden bugs and that all "wires connect."</li>
+  <li><strong>Increase model capacity.</strong> Try to overfit the full training set. If you can't, something is wrong.</li>
+  <li><strong>Regularize.</strong> Gradually add weight decay, dropout, data augmentation, etc. Monitor validation loss.</li>
+  <li><strong>Tune hyperparameters at small scale first.</strong> Spot trends before committing to expensive large-scale runs.</li>
+</ol>
+
+<h2 id="defaults">Recommended Defaults</h2>
+<table>
+  <tr><th>Setting</th><th>Default</th></tr>
+  <tr><td>Activation</td><td>ReLU</td></tr>
+  <tr><td>Hidden layers (MLP)</td><td>2 &times; 128</td></tr>
+  <tr><td>Optimizer</td><td>Adam (default hyperparams)</td></tr>
+  <tr><td>Learning rate</td><td>3 &times; 10<sup>-4</sup> + cosine decay</td></tr>
+  <tr><td>Batch size</td><td>128</td></tr>
+  <tr><td>Weight decay</td><td>0 (increase if overfitting)</td></tr>
+  <tr><td>Initialization</td><td>He (assumes ReLU, zero-centered unit-variance inputs)</td></tr>
+</table>
+
+<h3>Model Selection by Data Type</h3>
+<table>
+  <tr><th>Data Type</th><th>Starter Model</th><th>Baseline</th></tr>
+  <tr><td>Vectors/tabular</td><td>MLP (2&times;128, ReLU)</td><td>XGBoost</td></tr>
+  <tr><td>Images</td><td>CNN (e.g., ResNet-18)</td><td>XGBoost + featurize</td></tr>
+  <tr><td>Graphs</td><td>GNN (not just GCN)</td><td>XGBoost + featurize</td></tr>
+  <tr><td>Time series</td><td>LSTM (2 layers &times; 128)</td><td>Naive last-value</td></tr>
+</table>
+
+<h2 id="diagnostics">Loss Curve Diagnostics</h2>
+<table>
+  <tr><th>Symptom</th><th>Likely Cause</th><th>Fix</th></tr>
+  <tr><td>Loss starts huge then drops to ~1 immediately</td><td>Bad init or scale mismatch, LR too high</td><td>Normalize inputs, add warmup, lower LR</td></tr>
+  <tr><td>Persistent oscillation</td><td>LR too high, momentum too high, small batch</td><td>Lower LR, tune betas, increase batch size</td></tr>
+  <tr><td>Repeating wave with fixed period</td><td>Forgot to shuffle data, sampler bug</td><td>Shuffle + stratify, check sampler seeding</td></tr>
+  <tr><td>Sudden spike then slow recovery</td><td>Outlier/corrupted batch, NaNs</td><td>Assert-finite checks, gradient clipping</td></tr>
+  <tr><td>Extremely noisy batch loss</td><td>Small batch, heavy augmentation</td><td>Track EMA, monitor val on fixed set</td></tr>
+  <tr><td>Loss jumps at specific steps</td><td>Optimizer state not restored at checkpoint</td><td>Save full checkpoint (model + optimizer + scheduler)</td></tr>
+  <tr><td>No downward trend (flat)</td><td>LR too low, frozen params, label bug</td><td>Overfit 1 batch sanity test, check requires_grad</td></tr>
+  <tr><td>Quick win then stagnation</td><td>LR too low, capacity limit</td><td>Tune LR schedule, increase capacity</td></tr>
+  <tr><td>Loss becomes NaN/Inf</td><td>Overflow, log(0), exploding gradients</td><td>Finite checks, lower LR, gradient clipping, add eps</td></tr>
+  <tr><td>Val much worse than train immediately</td><td>Train/val preprocessing mismatch</td><td>Verify identical preprocessing (except augmentation)</td></tr>
+  <tr><td>Val mirrors train exactly (zero gap)</td><td>Data leakage / overlap</td><td>Hash IDs to check overlap, verify dataloader</td></tr>
+  <tr><td>Train loss higher than val loss</td><td>Dropout/augmentation active only in training</td><td>Normal! Check train() vs eval() modes are correct</td></tr>
+</table>
+
+<h2 id="hyperparameter-tuning">Hyperparameter Tuning</h2>
+
+<h3>Sensitivity Ranking</h3>
+<table>
+  <tr><th>Hyperparameter</th><th>Sensitivity</th></tr>
+  <tr><td>Learning rate</td><td><strong>High</strong></td></tr>
+  <tr><td>Learning rate schedule</td><td><strong>High</strong></td></tr>
+  <tr><td>Loss function</td><td><strong>High</strong></td></tr>
+  <tr><td>Layer size</td><td><strong>High</strong></td></tr>
+  <tr><td>Model depth</td><td>Medium</td></tr>
+  <tr><td>Weight initialization</td><td>Medium</td></tr>
+  <tr><td>Regularization weight</td><td>Medium</td></tr>
+  <tr><td>Kernel size</td><td>Medium</td></tr>
+  <tr><td>Optimizer choice</td><td>Low</td></tr>
+  <tr><td>Batch size</td><td>Low</td></tr>
+  <tr><td>Nonlinearity</td><td>Low</td></tr>
+</table>
+
+<h3>Tuning Methods</h3>
+<ol>
+  <li><strong>Manual:</strong> Requires understanding of algorithm. Most efficient for experts.</li>
+  <li><strong>Grid search:</strong> Simple, exhaustive. Expensive with many hyperparameters.</li>
+  <li><strong>Random search:</strong> Often better than grid (explores more of each dimension independently).</li>
+  <li><strong>Coarse-to-fine:</strong> Random search, then zoom into promising regions. <em>Most used in practice.</em></li>
+  <li><strong>Bayesian optimization:</strong> Maintains a probabilistic model of performance. Most efficient but harder to set up.</li>
+</ol>
+
+<h2 id="experiment-tracking">Experiment Tracking</h2>
+<p>Options: TensorBoard (baseline), Weights &amp; Biases (most popular in research), Sacred, Neptune.</p>
+
+<div class="nav-footer">
+  <a href="pytorch.html">&larr; PyTorch Core</a>
+  <a href="transformers.html">Transformers &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

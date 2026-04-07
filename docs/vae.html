@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variational Autoencoders - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li class="expanded"><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html" class="active">VAEs (L17)</a></li><li><a href="flows.html">Flows (L18)</a></li><li><a href="diffusion.html">Diffusion (L19&ndash;L21)</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Generative Models &raquo; VAEs</div>
+
+<h1>Variational Autoencoders</h1>
+<p><strong>Lecture:</strong> L17 &bull; <strong>Prince:</strong> Chapter 17</p>
+
+<h2 id="latent-variable">Latent Variable Models</h2>
+<p>The idea: model hidden causes $\mathbf{z}$ that explain the observed data $\mathbf{x}$.</p>
+<ul>
+  <li><strong>Prior:</strong> $\Pr(\mathbf{z}) = \mathcal{N}(\mathbf{0}, \mathbf{I})$ (standard normal)</li>
+  <li><strong>Decoder (generative model):</strong> $\Pr(\mathbf{x} \mid \mathbf{z}, \boldsymbol{\phi}) = \mathcal{N}(\mathbf{x}; f[\mathbf{z}, \boldsymbol{\phi}], \sigma^2\mathbf{I})$</li>
+  <li><strong>Marginal likelihood:</strong> $\Pr(\mathbf{x} \mid \boldsymbol{\phi}) = \int \Pr(\mathbf{x} \mid \mathbf{z}, \boldsymbol{\phi}) \, \Pr(\mathbf{z}) \, d\mathbf{z}$</li>
+</ul>
+
+<div class="admonition important">
+  <div class="admonition-title">The Problem</div>
+  <p>The marginal likelihood integral is <strong>intractable</strong> for nonlinear decoders (neural networks). We cannot compute it exactly because the integral has no closed form.</p>
+</div>
+
+<h2 id="elbo">The ELBO (Evidence Lower Bound)</h2>
+
+<h3>Derivation Step 1: Introduce $q(\mathbf{z})$</h3>
+<p>Multiply and divide by an auxiliary distribution $q(\mathbf{z})$ inside the log-likelihood:</p>
+<div class="formula">
+$$\log \Pr(\mathbf{x} \mid \boldsymbol{\phi}) = \log \int \frac{\Pr(\mathbf{x}, \mathbf{z} \mid \boldsymbol{\phi})}{q(\mathbf{z})} q(\mathbf{z}) \, d\mathbf{z}$$
+</div>
+
+<h3>Step 2: Apply Jensen's Inequality</h3>
+<p>Since $\log$ is concave, push it inside the expectation:</p>
+<div class="formula">
+$$\log \Pr(\mathbf{x} \mid \boldsymbol{\phi}) \geq \mathbb{E}_{q(\mathbf{z})}\!\left[\log \frac{\Pr(\mathbf{x}, \mathbf{z} \mid \boldsymbol{\phi})}{q(\mathbf{z})}\right] = \text{ELBO}$$
+</div>
+
+<h3>The Gap: KL Divergence</h3>
+<div class="formula">
+$$\log \Pr(\mathbf{x}) = \text{ELBO} + D_\text{KL}(q(\mathbf{z}) \| \Pr(\mathbf{z} \mid \mathbf{x}))$$
+</div>
+<p>Since KL $\geq 0$, ELBO $\leq \log \Pr(\mathbf{x})$. The bound is tight when $q(\mathbf{z}) = \Pr(\mathbf{z} \mid \mathbf{x})$ (the true posterior).</p>
+
+<h3>ELBO Decomposition</h3>
+<div class="formula">
+$$\text{ELBO} = \underbrace{\mathbb{E}_{q(\mathbf{z})}\left[\log \Pr(\mathbf{x} \mid \mathbf{z}, \boldsymbol{\phi})\right]}_{\text{Reconstruction term}} - \underbrace{D_\text{KL}(q(\mathbf{z}) \| \Pr(\mathbf{z}))}_{\text{KL to prior (regularization)}}$$
+</div>
+
+<div class="key-concept">
+  <strong>Two terms:</strong>
+  <ol>
+    <li><strong>Reconstruction:</strong> How well can we reconstruct $\mathbf{x}$ from samples of $\mathbf{z}$?</li>
+    <li><strong>KL regularization:</strong> How close is $q(\mathbf{z})$ to the prior $\mathcal{N}(\mathbf{0}, \mathbf{I})$?</li>
+  </ol>
+</div>
+
+<h2 id="vae-architecture">VAE Architecture</h2>
+
+<h3>Encoder (Inference Network)</h3>
+<p>$q(\mathbf{z} \mid \mathbf{x}, \boldsymbol{\theta}) = \mathcal{N}(\boldsymbol{\mu}_\theta(\mathbf{x}), \text{diag}(\boldsymbol{\sigma}_\theta^2(\mathbf{x})))$</p>
+<p>A neural network that maps $\mathbf{x}$ to the parameters $\boldsymbol{\mu}$ and $\boldsymbol{\sigma}^2$ of the approximate posterior. This is <strong>amortized inference</strong>: one forward pass per sample.</p>
+
+<h3>Decoder (Generative Network)</h3>
+<p>$\Pr(\mathbf{x} \mid \mathbf{z}, \boldsymbol{\phi})$: a neural network that maps $\mathbf{z}$ to the parameters of $\Pr(\mathbf{x})$.</p>
+
+<h2 id="reparameterization">The Reparameterization Trick</h2>
+
+<p><strong>Problem:</strong> The ELBO involves an expectation over $q(\mathbf{z} \mid \mathbf{x})$. We need gradients through the sampling operation, but sampling is not differentiable.</p>
+
+<p><strong>Solution:</strong> Separate the randomness from the deterministic computation:</p>
+<div class="formula">
+$$\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$$
+$$\mathbf{z} = \boldsymbol{\mu}_\theta(\mathbf{x}) + \boldsymbol{\sigma}_\theta(\mathbf{x}) \odot \boldsymbol{\epsilon}$$
+</div>
+<p>Now $\mathbf{z}$ is a deterministic function of $\boldsymbol{\mu}, \boldsymbol{\sigma}, \boldsymbol{\epsilon}$, and we can backpropagate through $\boldsymbol{\mu}$ and $\boldsymbol{\sigma}$ to the encoder parameters.</p>
+
+<h2 id="kl-closed-form">Closed-Form KL Term</h2>
+<p>For two Gaussians (approximate posterior vs standard normal prior):</p>
+<div class="formula">
+$$D_\text{KL}\!\left(\mathcal{N}(\boldsymbol{\mu}, \text{diag}(\boldsymbol{\sigma}^2)) \| \mathcal{N}(\mathbf{0}, \mathbf{I})\right) = \frac{1}{2}\sum_{j=1}^{d}\left(\mu_j^2 + \sigma_j^2 - \log \sigma_j^2 - 1\right)$$
+</div>
+
+<h2 id="algorithm">VAE Training Algorithm</h2>
+<ol>
+  <li><strong>Encode:</strong> $\boldsymbol{\mu}, \boldsymbol{\sigma}^2 = \text{Encoder}(\mathbf{x})$</li>
+  <li><strong>Sample:</strong> $\mathbf{z} = \boldsymbol{\mu} + \boldsymbol{\sigma} \odot \boldsymbol{\epsilon}$, where $\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$</li>
+  <li><strong>Decode:</strong> $\hat{\mathbf{x}} = \text{Decoder}(\mathbf{z})$</li>
+  <li><strong>Compute loss:</strong> $-\text{ELBO} = -\mathbb{E}[\log \Pr(\mathbf{x} \mid \mathbf{z})] + D_\text{KL}(q \| p)$</li>
+  <li><strong>Update:</strong> both encoder ($\boldsymbol{\theta}$) and decoder ($\boldsymbol{\phi}$) with Adam/SGD</li>
+</ol>
+
+<p>In practice, the reconstruction term is estimated with a <strong>single sample</strong> of $\mathbf{z}$ per data point. The KL term is computed in closed form.</p>
+
+<h2 id="optimization-view">Optimization Perspective</h2>
+<ul>
+  <li><strong>Decoder updates</strong> improve model fit (better reconstruction)</li>
+  <li><strong>Encoder updates</strong> tighten the bound (better approximation of true posterior)</li>
+  <li>Both are updated jointly in every mini-batch</li>
+</ul>
+
+<div class="nav-footer">
+  <a href="pgm.html">&larr; PGMs</a>
+  <a href="flows.html">Normalizing Flows &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

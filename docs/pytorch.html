@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PyTorch Core - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li class="expanded"><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html" class="active">PyTorch Core (L06)</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs &amp; Decoding</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Practical Deep Learning &raquo; PyTorch Core</div>
+
+<h1>PyTorch Core</h1>
+<p><strong>Lecture:</strong> L06 (Notebook)</p>
+
+<h2 id="tensors">1. Tensors</h2>
+<p>PyTorch tensors are NumPy-like arrays with GPU support and automatic differentiation.</p>
+<pre><code>import torch
+x = torch.tensor([5., 3.])           # Create a tensor
+x = torch.randn(10)                   # Random normal
+x = torch.zeros(10)                   # Zeros
+x_np = x.numpy()                      # To NumPy
+x_t = torch.tensor(np.array([1,2,3])) # From NumPy</code></pre>
+
+<h2 id="devices">2. Devices: CPU vs GPU</h2>
+<pre><code>device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+x = x.to(device)  # Move tensor to GPU</code></pre>
+
+<h2 id="autograd">3. Autograd: Automatic Differentiation</h2>
+<p>PyTorch performs tape-based reverse-mode autodiff. Set <code>requires_grad=True</code> to track gradients.</p>
+<pre><code>x = torch.tensor([np.pi/4], requires_grad=True)
+y = torch.sum(torch.cos(x) ** 2)
+grads = torch.autograd.grad(y, x)[0]  # Exact gradient</code></pre>
+<p>Each operation creates a <code>grad_fn</code> pointer that forms the computation graph for backpropagation.</p>
+
+<h2 id="optimization">4. Optimization Loop</h2>
+<pre><code>w = torch.tensor([0.0], requires_grad=True)
+opt = torch.optim.SGD([w], lr=0.1)
+
+for step in range(20):
+    opt.zero_grad()        # Clear old gradients
+    loss = (w - 3.0).pow(2).sum()
+    loss.backward()        # Compute gradients
+    opt.step()             # Update parameters</code></pre>
+
+<h2 id="nn-module">5. nn.Module: Building Models</h2>
+<p>Subclass <code>nn.Module</code> for automatic gradient tracking and parameter management.</p>
+<pre><code>class DeepNN(nn.Module):
+    def __init__(self, hidden=32):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(1, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, hidden),
+            nn.ReLU(),
+            nn.Linear(hidden, 1),
+        )
+
+    def forward(self, x):
+        return self.net(x)</code></pre>
+
+<div class="admonition note">
+  <div class="admonition-title">Important</div>
+  <p>All child modules must be initialized in <code>__init__</code> (not in <code>forward</code>) so that PyTorch can discover and track their parameters.</p>
+</div>
+
+<h2 id="training-loop">6. Full Training Loop</h2>
+<pre><code>net = DeepNN(hidden=32).to(device)
+opt = torch.optim.Adam(net.parameters(), lr=1e-2)
+loss_fn = nn.MSELoss()
+
+for step in range(500):
+    opt.zero_grad()
+    x = torch.randn(256, 1, device=device)
+    y = torch.sin(x)
+    pred = net(x)
+    loss = loss_fn(pred, y)
+    loss.backward()
+    opt.step()</code></pre>
+
+<h2 id="dataloader">7. DataLoader for Classification</h2>
+<pre><code>from torch.utils.data import TensorDataset, DataLoader
+
+train_ds = TensorDataset(X_train_tensor, y_train_tensor)
+train_loader = DataLoader(train_ds, batch_size=64, shuffle=True)
+
+for inputs, labels in train_loader:
+    inputs, labels = inputs.to(device), labels.to(device)
+    outputs = model(inputs)
+    loss = criterion(outputs, labels)
+    ...</code></pre>
+
+<h2 id="mlp-vs-cnn">8. MLP vs CNN Comparison</h2>
+<p>On MNIST-1D (a small 1D dataset designed to make architecture differences obvious):</p>
+<table>
+  <tr><th>Model</th><th>Parameters</th><th>Test Accuracy (20 epochs)</th></tr>
+  <tr><td>Simple MLP (1 hidden layer, 64 units)</td><td>3,274</td><td>~51%</td></tr>
+  <tr><td>Simple CNN (2 conv + 1 FC)</td><td>1,738</td><td>~67%</td></tr>
+</table>
+<p>The CNN achieves much better accuracy with <em>fewer</em> parameters, demonstrating the power of inductive bias for structured data.</p>
+
+<h2 id="key-patterns">Key Patterns to Know</h2>
+<ul>
+  <li><code>model.train()</code> / <code>model.eval()</code> &mdash; switches dropout and batch norm behavior</li>
+  <li><code>with torch.no_grad():</code> &mdash; disables gradient tracking for inference</li>
+  <li><code>loss.backward()</code> &mdash; computes gradients</li>
+  <li><code>optimizer.zero_grad()</code> &mdash; clears accumulated gradients before each step</li>
+  <li><code>optimizer.step()</code> &mdash; applies the gradient update</li>
+  <li><code>.unsqueeze(1)</code> &mdash; add channel dimension for CNN input</li>
+</ul>
+
+<div class="nav-footer">
+  <a href="residual-nets.html">&larr; Residual Networks</a>
+  <a href="best-practices.html">Best Practices &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

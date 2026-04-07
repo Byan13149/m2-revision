@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regularization &amp; Generalization - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li class="expanded"><a href="#">Neural Networks Foundations</a><ul>
+      <li><a href="nn-review.html">NN Review</a></li>
+      <li><a href="loss-functions.html">Loss Functions &amp; Training</a></li>
+      <li><a href="regularization.html" class="active">Regularization</a></li>
+    </ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html">Transformers</a></li><li><a href="llms.html">LLMs &amp; Decoding</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Neural Networks Foundations &raquo; Regularization</div>
+
+<h1>Regularization &amp; Generalization</h1>
+<p><strong>Lectures:</strong> L03 &bull; <strong>Prince:</strong> Chapters 8&ndash;9</p>
+
+<h2 id="bias-variance">Bias-Variance Tradeoff (Ch 8)</h2>
+
+<p>Test error can be decomposed into three sources:</p>
+<div class="formula">
+$$\mathbb{E}[\text{test error}] = \text{noise}^2 + \text{bias}^2 + \text{variance}$$
+</div>
+
+<table>
+  <tr><th>Component</th><th>Meaning</th><th>Reduced by</th></tr>
+  <tr><td><strong>Noise</strong></td><td>Inherent randomness in the data (irreducible)</td><td>Better data collection</td></tr>
+  <tr><td><strong>Bias</strong></td><td>Systematic error from model being too simple</td><td>More capacity / flexibility</td></tr>
+  <tr><td><strong>Variance</strong></td><td>Sensitivity to choice of training set</td><td>More data / regularization</td></tr>
+</table>
+
+<h3>Double Descent</h3>
+<div class="admonition note">
+  <div class="admonition-title">Modern View: Double Descent</div>
+  <p>Classical theory predicts a U-shaped test error curve. But modern deep learning exhibits <strong>double descent</strong>: beyond the interpolation threshold (where the model can fit the training data perfectly), test error <em>decreases again</em> as model capacity increases further. This requires some form of regularization (even implicit) to work.</p>
+</div>
+
+<h3>Choosing Hyperparameters</h3>
+<p>Use three data splits:</p>
+<ul>
+  <li><strong>Training set:</strong> fit model parameters</li>
+  <li><strong>Validation set:</strong> choose hyperparameters (capacity, learning rate, regularization strength)</li>
+  <li><strong>Test set:</strong> evaluate final performance <em>once</em></li>
+</ul>
+
+<h2 id="explicit-reg">Explicit Regularization (Ch 9)</h2>
+
+<p>Add a penalty term to the loss:</p>
+<div class="formula">
+$$\tilde{\mathcal{L}}[\boldsymbol{\phi}] = \mathcal{L}[\boldsymbol{\phi}] + \lambda \cdot \Omega[\boldsymbol{\phi}]$$
+</div>
+<p>where $\lambda > 0$ controls regularization strength.</p>
+
+<h3>L2 Regularization (Weight Decay)</h3>
+<div class="formula">
+$$\Omega[\boldsymbol{\phi}] = \|\boldsymbol{\phi}\|_2^2 = \sum_j \phi_j^2$$
+</div>
+<ul>
+  <li>Encourages <strong>small</strong> weights &rArr; smoother functions</li>
+  <li>Also called Tikhonov regularization, ridge regression</li>
+  <li>In neural networks, usually applied to weights only (not biases) &rArr; "weight decay"</li>
+</ul>
+
+<h3>Probabilistic Interpretation</h3>
+<div class="key-concept">
+  <strong>L2 regularization = Gaussian prior on weights.</strong>
+  $$\Pr(\boldsymbol{\phi}) = \mathcal{N}(\mathbf{0}, \sigma_\phi^2 \mathbf{I})$$
+  MAP estimation with this prior gives the same objective as L2-regularized MLE, with $\lambda = 1/(2\sigma_\phi^2)$.
+</div>
+
+<h3>L1 Regularization</h3>
+<div class="formula">
+$$\Omega[\boldsymbol{\phi}] = \|\boldsymbol{\phi}\|_1 = \sum_j |\phi_j|$$
+</div>
+<p>Encourages <strong>sparse</strong> weights (many exactly zero). Equivalent to a Laplace prior.</p>
+
+<h2 id="implicit-reg">Implicit Regularization</h2>
+
+<h3>SGD as Regularizer</h3>
+<ul>
+  <li>Gradient descent with finite step size approximates a differential equation with an implicit regularization term</li>
+  <li>SGD noise disfavors regions where gradients are steep</li>
+  <li>SGD prefers solutions where all batches have similar gradients</li>
+  <li>Larger learning rates &rArr; stronger implicit regularization &rArr; often better generalization</li>
+</ul>
+
+<h2 id="heuristics">Regularization Heuristics</h2>
+
+<h3>Early Stopping</h3>
+<p>Stop training when validation loss starts increasing. Weights start small (near initialization) and don't have time to grow large and overfit. Reduces effective model complexity.</p>
+
+<h3>Ensembling</h3>
+<p>Train multiple models independently (different initializations or data subsets). Average their predictions. Reduces variance without increasing bias.</p>
+
+<h3>Dropout</h3>
+<p>During training, randomly zero out each hidden unit with probability $p$ (typically $p=0.5$). At test time, multiply weights by $(1-p)$.</p>
+<ul>
+  <li>Forces the network to not rely on any single hidden unit</li>
+  <li>Can be interpreted as training an implicit ensemble</li>
+  <li>Effectively reduces co-adaptation between neurons</li>
+</ul>
+
+<h3>Batch Normalization</h3>
+<p>Normalize activations within each mini-batch, then apply learnable scale and shift:</p>
+<div class="formula">
+$$\hat{h}_j = \frac{h_j - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}, \quad \text{then} \quad \tilde{h}_j = \gamma \hat{h}_j + \beta$$
+</div>
+<p>where $\mu_B, \sigma_B^2$ are batch statistics, and $\gamma, \beta$ are learned parameters. Typically initialized to $\gamma=1, \beta=0$.</p>
+
+<h3>Data Augmentation</h3>
+<p>Often the <strong>strongest regularizer</strong> for images. Apply label-preserving transformations:</p>
+<ul>
+  <li>Random flips, crops, rotations</li>
+  <li>Color jitter, scaling</li>
+  <li>For physics: physically-motivated transformations</li>
+</ul>
+
+<h3>Label Smoothing</h3>
+<p>Replace hard labels (0/1) with soft labels ($\epsilon / K$ for wrong classes, $1 - \epsilon + \epsilon/K$ for correct class). Prevents overconfident predictions.</p>
+
+<h3>Transfer Learning</h3>
+<p>Pre-train on a large dataset (e.g., ImageNet), then fine-tune on your smaller task-specific dataset. The pre-trained features act as a strong regularizer.</p>
+
+<h2 id="summary">Summary Table</h2>
+
+<table class="comparison">
+  <tr><th>Method</th><th>Type</th><th>Mechanism</th></tr>
+  <tr><td>L2 / Weight decay</td><td>Explicit</td><td>Penalizes large weights</td></tr>
+  <tr><td>L1</td><td>Explicit</td><td>Promotes sparsity</td></tr>
+  <tr><td>SGD noise</td><td>Implicit</td><td>Prefers flat minima</td></tr>
+  <tr><td>Early stopping</td><td>Heuristic</td><td>Limits effective capacity</td></tr>
+  <tr><td>Dropout</td><td>Heuristic</td><td>Prevents co-adaptation</td></tr>
+  <tr><td>Batch norm</td><td>Heuristic</td><td>Stabilizes + smooths loss surface</td></tr>
+  <tr><td>Data augmentation</td><td>Heuristic</td><td>Increases effective dataset size</td></tr>
+  <tr><td>Ensembling</td><td>Heuristic</td><td>Reduces variance</td></tr>
+</table>
+
+<div class="nav-footer">
+  <a href="loss-functions.html">&larr; Loss Functions</a>
+  <a href="cnns.html">CNNs &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural Networks Review - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li class="expanded"><a href="#">Neural Networks Foundations</a><ul>
+      <li><a href="nn-review.html" class="active">NN Review (L01&ndash;L03)</a></li>
+      <li><a href="loss-functions.html">Loss Functions &amp; Training</a></li>
+      <li><a href="regularization.html">Regularization &amp; Generalization</a></li>
+    </ul></li>
+    <li><a href="#">Convolutional Networks</a><ul>
+      <li><a href="cnns.html">CNNs (L04&ndash;L05)</a></li>
+      <li><a href="residual-nets.html">Residual Networks</a></li>
+    </ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul>
+      <li><a href="pytorch.html">PyTorch Core (L06)</a></li>
+      <li><a href="best-practices.html">Best Practices (L07&ndash;L08)</a></li>
+    </ul></li>
+    <li><a href="#">Transformers &amp; LLMs</a><ul>
+      <li><a href="transformers.html">Transformers (L08&ndash;L10)</a></li>
+      <li><a href="llms.html">LLMs &amp; Decoding (L11)</a></li>
+    </ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul>
+      <li><a href="rl-foundations.html">RL Foundations (L12&ndash;L13)</a></li>
+      <li><a href="rl-algorithms.html">RL Algorithms (L14&ndash;L15)</a></li>
+    </ul></li>
+    <li><a href="#">Generative Models</a><ul>
+      <li><a href="pgm.html">PGMs (L16)</a></li>
+      <li><a href="vae.html">VAEs (L17)</a></li>
+      <li><a href="flows.html">Normalizing Flows (L18)</a></li>
+      <li><a href="diffusion.html">Diffusion Models (L19&ndash;L21)</a></li>
+    </ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Neural Networks Foundations &raquo; NN Review</div>
+
+<h1>Neural Networks Review</h1>
+<p><strong>Lectures:</strong> L01&ndash;L03 &bull; <strong>Prince:</strong> Chapters 3&ndash;5</p>
+
+<h2 id="notation">Notation (Prince Convention)</h2>
+<ul>
+  <li>Input: $\mathbf{x} \in \mathbb{R}^{D_i}$, Output: $\mathbf{y} \in \mathbb{R}^{D_o}$</li>
+  <li>Parameters (weights + biases): $\boldsymbol{\phi}$</li>
+  <li>Model: $\mathbf{y} = f[\mathbf{x}, \boldsymbol{\phi}]$</li>
+  <li>Hidden units / pre-activations: values before the activation function</li>
+  <li>Activations: values after the activation function</li>
+</ul>
+
+<h2 id="shallow-nn">Shallow Neural Networks (Ch 3)</h2>
+
+<p>A shallow network has <strong>one hidden layer</strong>:</p>
+
+<div class="formula">
+$$f[\mathbf{x}, \boldsymbol{\phi}] = \boldsymbol{\beta}_0 + \boldsymbol{\Omega}_1 \cdot a\!\left(\boldsymbol{\theta}_0 + \boldsymbol{\Omega}_0 \mathbf{x}\right)$$
+</div>
+
+<p>where $a(\cdot)$ is the activation function applied element-wise.</p>
+
+<h3>ReLU Activation</h3>
+<div class="formula">
+$$\text{ReLU}(z) = \max(0, z)$$
+</div>
+
+<p>With ReLU, a shallow network computes a <strong>piecewise linear function</strong>. Each hidden unit contributes one "joint" (kink) to the output. With $D$ hidden units in 1D, you get at most $D$ joints.</p>
+
+<div class="key-concept">
+  <strong>Universal Approximation Theorem:</strong> A shallow network with enough hidden units can approximate any continuous function on a compact domain to arbitrary precision. However, "enough" may mean exponentially many units &mdash; depth helps.
+</div>
+
+<h3>Key Nomenclature</h3>
+<table>
+  <tr><th>Term</th><th>Meaning</th></tr>
+  <tr><td>Biases</td><td>Y-offsets (additive constants)</td></tr>
+  <tr><td>Weights</td><td>Slopes / linear coefficients</td></tr>
+  <tr><td>Fully connected</td><td>Every unit in one layer connected to every unit in the next</td></tr>
+  <tr><td>Feedforward</td><td>No loops in the computation graph</td></tr>
+  <tr><td>Capacity</td><td>Roughly the number of hidden units</td></tr>
+</table>
+
+<h2 id="deep-nn">Deep Neural Networks (Ch 4)</h2>
+
+<p>Networks with <strong>more than one hidden layer</strong>. A deep network is a <em>composition</em> of simpler functions:</p>
+
+<div class="formula">
+$$f[\mathbf{x}, \boldsymbol{\phi}] = f_K \circ f_{K-1} \circ \cdots \circ f_1(\mathbf{x})$$
+</div>
+
+<p>where each $f_k$ is an affine transformation followed by an activation.</p>
+
+<h3>Why Depth Matters</h3>
+
+<div class="admonition note">
+  <div class="admonition-title">Exponential Expressiveness</div>
+  <p>Deep networks with ReLU can represent exponentially more linear regions than shallow networks with the same number of parameters. A network with $K$ layers of width $D$ can produce $O(D^K)$ linear regions, whereas a shallow network with $KD$ units gives only $O(KD)$ regions.</p>
+</div>
+
+<p>Composing two shallow networks:</p>
+<ul>
+  <li>Network 1 produces a piecewise linear function with $D_1$ joints</li>
+  <li>Network 2 "folds" each linear piece of Network 1, multiplying the number of regions</li>
+  <li>Result: up to $D_1 \times D_2$ linear regions from just $D_1 + D_2$ hidden units</li>
+</ul>
+
+<h3>General Matrix Form</h3>
+<p>For a $K$-layer network:</p>
+<div class="formula">
+$$\mathbf{h}_0 = \mathbf{x}$$
+$$\mathbf{h}_k = a(\boldsymbol{\beta}_k + \boldsymbol{\Omega}_k \mathbf{h}_{k-1}), \quad k = 1, \ldots, K$$
+$$\mathbf{y} = \boldsymbol{\beta}_{K+1} + \boldsymbol{\Omega}_{K+1} \mathbf{h}_K$$
+</div>
+
+<h2 id="activations">Activation Functions</h2>
+
+<table>
+  <tr><th>Function</th><th>Formula</th><th>Properties</th></tr>
+  <tr><td>ReLU</td><td>$\max(0, z)$</td><td>Default choice. Sparse activations. Can have "dead neurons."</td></tr>
+  <tr><td>Leaky ReLU</td><td>$\max(\alpha z, z)$</td><td>Avoids dead neurons ($\alpha \approx 0.01$)</td></tr>
+  <tr><td>Sigmoid</td><td>$\sigma(z) = 1/(1+e^{-z})$</td><td>Output in $(0,1)$. Used for binary classification output.</td></tr>
+  <tr><td>Tanh</td><td>$\tanh(z)$</td><td>Output in $(-1,1)$. Zero-centered.</td></tr>
+  <tr><td>Softmax</td><td>$e^{z_i} / \sum_j e^{z_j}$</td><td>Output sums to 1. Used for multiclass classification output.</td></tr>
+  <tr><td>GELU</td><td>$z \cdot \Phi(z)$</td><td>Smooth approximation of ReLU. Used in transformers.</td></tr>
+</table>
+
+<h2 id="forward-pass">Forward and Backward Pass</h2>
+
+<h3>Forward Pass</h3>
+<p>Compute activations layer by layer, from input to output. Store all intermediate values for the backward pass.</p>
+
+<h3>Backward Pass (Backpropagation)</h3>
+<p>Compute gradients of the loss $\mathcal{L}$ with respect to all parameters using the <strong>chain rule</strong> in reverse order.</p>
+
+<div class="formula">
+$$\frac{\partial \mathcal{L}}{\partial \boldsymbol{\Omega}_k} = \frac{\partial \mathcal{L}}{\partial \mathbf{h}_k} \cdot \frac{\partial \mathbf{h}_k}{\partial \boldsymbol{\Omega}_k}$$
+</div>
+
+<div class="admonition tip">
+  <div class="admonition-title">Backprop Complexity</div>
+  <p>One backward pass has roughly <strong>the same cost</strong> as one forward pass. Total gradient computation is $O(\text{number of parameters})$ per sample &mdash; this is what makes training neural networks tractable.</p>
+</div>
+
+<h3>Automatic Differentiation</h3>
+<p>Backpropagation is a special case of <strong>reverse-mode automatic differentiation</strong>. PyTorch builds a computation graph during the forward pass, then traverses it in reverse to compute gradients exactly (not numerically).</p>
+
+<h2 id="parameter-counting">Parameter Counting</h2>
+
+<p>For a fully-connected layer mapping $D_\text{in}$ inputs to $D_\text{out}$ outputs:</p>
+<div class="formula">
+$$\text{Parameters} = D_\text{in} \times D_\text{out} + D_\text{out} = D_\text{out}(D_\text{in} + 1)$$
+</div>
+<p>(weights + biases)</p>
+
+<div class="admonition warning">
+  <div class="admonition-title">Common Exam Question</div>
+  <p>Given a network architecture, count the total number of trainable parameters. Remember to include biases and consider which layers have parameters (e.g., ReLU has none, BatchNorm has $2D$ learnable parameters).</p>
+</div>
+
+<h2 id="initialization">Weight Initialization (Ch 7)</h2>
+
+<p>Proper initialization keeps activations and gradients in a well-scaled range throughout the network.</p>
+
+<h3>He (Kaiming) Initialization</h3>
+<p>For ReLU networks, initialize weights from:</p>
+<div class="formula">
+$$w_{ij} \sim \mathcal{N}\!\left(0, \frac{2}{D_\text{in}}\right)$$
+</div>
+<p>This compensates for the fact that ReLU kills half the activations (zeroes out negative values), so variance would otherwise shrink by half per layer.</p>
+
+<h3>Xavier (Glorot) Initialization</h3>
+<p>For tanh/sigmoid networks:</p>
+<div class="formula">
+$$w_{ij} \sim \mathcal{N}\!\left(0, \frac{2}{D_\text{in} + D_\text{out}}\right)$$
+</div>
+
+<div class="nav-footer">
+  <a href="index.html">&larr; Home</a>
+  <a href="loss-functions.html">Loss Functions &amp; Training &rarr;</a>
+</div>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transformers - M2 Deep Learning</title>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+  onload="renderMathInElement(document.body, {delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]});"></script>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header"><h1>M2 Deep Learning</h1><p>Exam Revision</p></div>
+  <div class="sidebar-search"><input type="text" placeholder="Search topics..."></div>
+  <nav><ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="#">Neural Networks Foundations</a><ul><li><a href="nn-review.html">NN Review</a></li><li><a href="loss-functions.html">Loss Functions</a></li><li><a href="regularization.html">Regularization</a></li></ul></li>
+    <li><a href="#">Convolutional Networks</a><ul><li><a href="cnns.html">CNNs</a></li><li><a href="residual-nets.html">Residual Networks</a></li></ul></li>
+    <li><a href="#">Practical Deep Learning</a><ul><li><a href="pytorch.html">PyTorch Core</a></li><li><a href="best-practices.html">Best Practices</a></li></ul></li>
+    <li class="expanded"><a href="#">Transformers &amp; LLMs</a><ul><li><a href="transformers.html" class="active">Transformers (L08&ndash;L10)</a></li><li><a href="llms.html">LLMs &amp; Decoding</a></li></ul></li>
+    <li><a href="#">Reinforcement Learning</a><ul><li><a href="rl-foundations.html">RL Foundations</a></li><li><a href="rl-algorithms.html">RL Algorithms</a></li></ul></li>
+    <li><a href="#">Generative Models</a><ul><li><a href="pgm.html">PGMs</a></li><li><a href="vae.html">VAEs</a></li><li><a href="flows.html">Flows</a></li><li><a href="diffusion.html">Diffusion</a></li></ul></li>
+  </ul></nav>
+</div>
+
+<div class="main-content">
+<div class="breadcrumb"><a href="index.html">Home</a> &raquo; Transformers &amp; LLMs &raquo; Transformers</div>
+
+<h1>Transformers</h1>
+<p><strong>Lectures:</strong> L08&ndash;L10 &bull; <strong>Prince:</strong> Chapter 12</p>
+
+<h2 id="motivation">Design Motivation</h2>
+<p>Originally designed for NLP. Three requirements:</p>
+<ol>
+  <li><strong>Compute efficiency:</strong> process hundreds/thousands of interconnected words encoded as high-dimensional vectors</li>
+  <li><strong>Length generalization:</strong> handle variable-length input sequences</li>
+  <li><strong>Attention:</strong> attend to specific parts of earlier text for context (possibly very far away)</li>
+</ol>
+
+<h2 id="tokenization">Tokenization</h2>
+<p>Convert text to a sequence of integer indices, each mapped to a learned embedding vector.</p>
+
+<h3>Tokenization Levels</h3>
+<table>
+  <tr><th>Level</th><th>Pros</th><th>Cons</th></tr>
+  <tr><td><strong>Word-level</strong></td><td>Simple, intuitive</td><td>Large vocabulary, OOV problems</td></tr>
+  <tr><td><strong>Character-level</strong></td><td>Handles any text</td><td>Very long sequences, slow</td></tr>
+  <tr><td><strong>Subword (BPE)</strong></td><td>Balance of granularity and efficiency</td><td>More complex</td></tr>
+</table>
+
+<h3>Byte Pair Encoding (BPE)</h3>
+<ol>
+  <li>Start with character-level tokens</li>
+  <li>Count pair frequencies across the corpus</li>
+  <li>Merge the most frequent pair into a new token</li>
+  <li>Repeat until desired vocabulary size</li>
+</ol>
+<p>Example: "low lower lowest" &rarr; merge (l,o)&rarr;LO, (LO,w)&rarr;LOW &rarr; vocabulary = {LOW, <space>, e, r, s, t}</p>
+
+<h2 id="embeddings">Embeddings</h2>
+<p>Each token index is looked up in a learned embedding matrix to produce a dense vector. These embeddings capture semantic relationships in a continuous space.</p>
+
+<h2 id="self-attention">Self-Attention</h2>
+
+<p>The core mechanism of transformers. For a sequence of vectors $\{\mathbf{x}_1, \ldots, \mathbf{x}_n\}$:</p>
+
+<h3>Queries, Keys, and Values</h3>
+<p>Each input vector $\mathbf{x}_i$ is projected into three different representations:</p>
+<div class="formula">
+$$\mathbf{q}_i = \mathbf{W}_Q \mathbf{x}_i, \quad \mathbf{k}_i = \mathbf{W}_K \mathbf{x}_i, \quad \mathbf{v}_i = \mathbf{W}_V \mathbf{x}_i$$
+</div>
+
+<h3>Attention Weights</h3>
+<p>Compute how much each position $j$ should contribute to position $i$:</p>
+<div class="formula">
+$$a_{ij} = \text{softmax}_j\!\left(\frac{\mathbf{q}_i \cdot \mathbf{k}_j}{\sqrt{d_k}}\right)$$
+</div>
+<p>Divide by $\sqrt{d_k}$ to keep variance unit-scale (prevents softmax saturation).</p>
+
+<h3>Output</h3>
+<div class="formula">
+$$\text{output}_i = \sum_{j=1}^{n} a_{ij} \, \mathbf{v}_j$$
+</div>
+
+<div class="key-concept">
+  <strong>Intuition:</strong> Each position $i$ "queries" all positions $j$. The dot product $\mathbf{q}_i \cdot \mathbf{k}_j$ measures compatibility. The output is a weighted average of values, where the weights come from the query-key compatibility.
+</div>
+
+<h3>Matrix Form</h3>
+<div class="formula">
+$$\text{Attention}(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = \text{softmax}\!\left(\frac{\mathbf{Q}\mathbf{K}^\top}{\sqrt{d_k}}\right)\mathbf{V}$$
+</div>
+
+<h2 id="multi-head">Multi-Head Attention</h2>
+<p>Run $H$ independent attention heads in parallel, each with its own $\mathbf{W}_Q^h, \mathbf{W}_K^h, \mathbf{W}_V^h$, then concatenate and project:</p>
+<div class="formula">
+$$\text{MultiHead}(\mathbf{X}) = \text{Concat}(\text{head}_1, \ldots, \text{head}_H) \cdot \mathbf{W}_O$$
+</div>
+<p>Each head attends to different features/relationships (analogous to multiple CNN channels).</p>
+
+<h2 id="positional-encoding">Positional Encodings</h2>
+<p>Self-attention has <strong>no built-in notion of position</strong>. Solution: add or concatenate position information to the embeddings.</p>
+
+<h3>Sinusoidal Positional Encodings</h3>
+<p>Fixed encodings using sine and cosine functions at different frequencies. The periodic nature captures relative positions, acting as a "ruler" for attention.</p>
+
+<h3>Learned Positional Embeddings</h3>
+<p>A separate embedding table mapping position indices to vectors. More flexible but limited to a maximum sequence length.</p>
+
+<h2 id="transformer-block">The Transformer Block</h2>
+<p>Each block applies (with residual connections and layer normalization):</p>
+<pre><code>x &rarr; LayerNorm &rarr; Multi-Head Attention &rarr; (+x) &rarr; LayerNorm &rarr; MLP (Feed-Forward) &rarr; (+x)</code></pre>
+
+<p>The MLP (feed-forward network) is applied independently to each position. It typically expands dimensions (e.g., 4&times;) and then contracts back.</p>
+
+<h2 id="architectures">Transformer Architectures</h2>
+
+<table class="comparison">
+  <tr><th>Architecture</th><th>Type</th><th>Masking</th><th>Use Case</th></tr>
+  <tr><td><strong>BERT</strong></td><td>Encoder-only</td><td>Bidirectional (no mask)</td><td>Understanding tasks (classification, NER)</td></tr>
+  <tr><td><strong>GPT</strong></td><td>Decoder-only</td><td>Causal mask (can only attend to past)</td><td>Text generation, LLMs</td></tr>
+  <tr><td><strong>Original Transformer</strong></td><td>Encoder-Decoder</td><td>Cross-attention between encoder and decoder</td><td>Translation</td></tr>
+</table>
+
+<h3>Encoder-Only (BERT)</h3>
+<ul>
+  <li>Bidirectional: each token can attend to all others</li>
+  <li>Pre-trained with masked language modeling (predict randomly masked tokens)</li>
+  <li>Fine-tuned on downstream tasks</li>
+</ul>
+
+<h3>Decoder-Only (GPT)</h3>
+<ul>
+  <li>Autoregressive: each token can only attend to itself and previous tokens</li>
+  <li>Causal masking: set future attention weights to $-\infty$ before softmax</li>
+  <li>The final token's embedding is used for next-token prediction</li>
+</ul>
+
+<h3>Cross-Attention</h3>
+<p>Used in encoder-decoder models. The decoder's queries attend to the encoder's keys and values, allowing the decoder to condition on the full input sequence.</p>
+
+<h2 id="vit">Vision Transformers (ViT)</h2>
+<ul>
+  <li>Split images into fixed-size patches (e.g., 16&times;16)</li>
+  <li>Flatten each patch and embed it as a token</li>
+  <li>Add positional embeddings</li>
+  <li>Process through standard transformer blocks</li>
+  <li>Self-attention captures long-range dependencies across the entire image</li>
+</ul>
+
+<div class="nav-footer">
+  <a href="best-practices.html">&larr; Best Practices</a>
+  <a href="llms.html">LLMs &amp; Decoding &rarr;</a>
+</div>
+</div>
+<script src="js/main.js"></script>
+</body>
+</html>
